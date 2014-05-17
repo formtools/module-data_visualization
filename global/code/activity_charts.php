@@ -562,9 +562,9 @@ function _dv_get_activity_account_select_query_info($submission_count_group, $da
 		        "last_5_years"   => 1825
 		      );
 		      $first_day = date("Y-m-d", date("U") - ($map[$date_range] * $day_in_secs));
-		      list($start_year, $start_month, $start_day) = explode("-", $first_day);
 		      break;
 		  }
+		  list($start_year, $start_month, $start_day) = explode("-", $first_day);
     }
 
     // each result is a MONTH. Make a list of all possible months; we'll overlay the actual counts after
