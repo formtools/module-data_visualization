@@ -17,7 +17,7 @@
 
     {include file="messages.tpl"}
 
-    <div><b>{$L.word_actions}</b></h4>
+    <div><b>{$L.word_actions}</b></div>
     <ul>
       <li><a href="../">{$L.phrase_list_visualizations}</a></li>
       <li><a href="add.php">{$L.phrase_create_new_field_chart}</a></li>

@@ -20,7 +20,7 @@
       <textarea class="medium_grey" style="width:99%; height: 100px">ft_include_module("data_visualization");
 $width  = 600;
 $height = 300;
-dv_display_visualization(1, $width, $height);</textarea>
+dv_display_visualization({$vis_id}, $width, $height);</textarea>
     </div>
 
     <div>
@@ -84,7 +84,7 @@ dv_display_visualization({$vis_id}, $width, $height);
     <td>
       <input type="radio" name="is_submenu" id="is1" value="yes" />
         <label for="is1">{$LANG.word_yes}</label>
-      <input type="radio" name="is_submenu" id="is2" value="no" checked />
+      <input type="radio" name="is_submenu" id="is2" value="no" checked="checked" />
         <label for="is2">{$LANG.word_no}</label>
     </td>
   </tr>
