@@ -388,6 +388,16 @@ function dv_display_in_pages_module($location, $params)
 
 function dv_display_visualization($vis_id, $width, $height, $overridden_settings = array())
 {
+  global $g_cache;
+
+  if (!isset($g_cache["data_visualization_{$vis_id}_count"]))
+    $g_cache["data_visualization_{$vis_id}_count"] = 1;
+  else
+    $g_cache["data_visualization_{$vis_id}_count"]++;
+
+
+  $id_suffix = $g_cache["data_visualization_{$vis_id}_count"];
+
   $vis_info = dv_get_visualization_for_display($vis_id);
   $vis_type   = $vis_info["vis_type"];
   $chart_type = $vis_info["chart_type"];
@@ -423,7 +433,7 @@ function dv_display_visualization($vis_id, $width, $height, $overridden_settings
         $line_width = $overridden_settings["line_width"];
 
       $js_lines[] =<<< END
-var chart = new google.visualization.$chart_class(document.getElementById("dv_vis_{$vis_id}"));
+var chart = new google.visualization.$chart_class(document.getElementById("dv_vis_{$vis_id}_{$id_suffix}"));
 var settings = {
   width: $width,
   height: $height,
@@ -442,12 +452,12 @@ END;
         $colour = $vis_info["vis_colour"];
         if (isset($overridden_settings["colour"]))
           $colour = $overridden_settings["colour"];
-	      $line_width = $vis_info["line_width"];
-	      if (isset($overridden_settings["line_width"]) && is_numeric($overridden_settings["line_width"]))
-	        $line_width = $overridden_settings["line_width"];
+        $line_width = $vis_info["line_width"];
+        if (isset($overridden_settings["line_width"]) && is_numeric($overridden_settings["line_width"]))
+          $line_width = $overridden_settings["line_width"];
 
         $js_lines[] =<<< END
-var chart = new google.visualization.ColumnChart(document.getElementById("dv_vis_{$vis_id}"));
+var chart = new google.visualization.ColumnChart(document.getElementById("dv_vis_{$vis_id}_{$id_suffix}"));
 var settings = {
   width:  $width,
   height: $height,
@@ -466,12 +476,12 @@ END;
         $colour = $overridden_settings["colour"];
 
       $js_lines[] =<<< END
-var chart = new google.visualization.BarChart(document.getElementById("dv_vis_{$vis_id}"));
+var chart = new google.visualization.BarChart(document.getElementById("dv_vis_{$vis_id}_{$id_suffix}"));
 var settings = {
   width:  $width,
   height: $height,
   colors: ["$colour"],
-  title: '$title',
+  title:  '$title',
   legend: 'none'
 }
 END;
@@ -491,13 +501,13 @@ END;
       $legend = ($include_legend == "yes") ? "right" : "none";
 
       $js_lines[] =<<< END
-var chart = new google.visualization.PieChart(document.getElementById("dv_vis_{$vis_id}"));
+var chart = new google.visualization.PieChart(document.getElementById("dv_vis_{$vis_id}_{$id_suffix}"));
 var settings = {
-  width:  $width,
-  height: $height,
-  is3D: $is_3D,
+  width:   $width,
+  height:  $height,
+  is3D:    $is_3D,
   legend: '$legend',
-  title: '$title'
+  title:  '$title'
 }
 END;
       break;
@@ -507,7 +517,7 @@ END;
 
   echo <<< END
 <script src="https://www.google.com/jsapi"></script>
-<div id="dv_vis_{$vis_id}"></div>
+<div id="dv_vis_{$vis_id}_{$id_suffix}"></div>
 <script>
 google.load("visualization", "1", {packages:["corechart"]});
 google.setOnLoadCallback(vis_drawChart);

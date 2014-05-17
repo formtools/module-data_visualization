@@ -89,7 +89,7 @@ $page_vars["head_string"] =<<<END
   <script src="https://www.google.com/jsapi"></script>
   <link type="text/css" rel="stylesheet" href="global/css/styles.css">
   <script src="global/scripts/manage_visualizations.js"></script>
-  <script src="global/scripts/visualizations.js"></script>
+  <script src="global/scripts/visualizations.js?v=2"></script>
   <link type="text/css" rel="stylesheet" href="global/css/visualizations.css">
 
 <style type="text/css">

@@ -245,19 +245,14 @@ function dv_get_activity_info($form_id, $view_id, $date_range, $submission_count
       break;
   }
 
-  $where_clauses = array();
+  $where_clauses = array("is_finalized = 'yes'");
   if (!empty($date_range_clause)) {
     $where_clauses[] = $date_range_clause;
   }
   if (!empty($filter_sql_clauses)) {
     $where_clauses[] = "(" . implode(" AND ", $filter_sql_clauses) . ")";
   }
-
-  $where_clause = "";
-  if (!empty($where_clauses))
-  {
-  	$where_clause = "WHERE " . implode(" AND ", $where_clauses);
-  }
+	$where_clause = "WHERE " . implode(" AND ", $where_clauses);
 
   // do a quick test to confirm that there's at least a single result with the parameters specified
   $count_test_query = mysql_query("

@@ -7,8 +7,8 @@
 $MODULE["author"]          = "Encore Web Studios";
 $MODULE["author_email"]    = "formtools@encorewebstudios.com";
 $MODULE["author_link"]     = "http://www.encorewebstudios.com";
-$MODULE["version"]         = "1.0.4";
-$MODULE["date"]            = "2011-09-23";
+$MODULE["version"]         = "1.0.5";
+$MODULE["date"]            = "2011-09-26";
 $MODULE["is_premium"]      = "yes";
 $MODULE["origin_language"] = "en_us";
 

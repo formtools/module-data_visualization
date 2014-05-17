@@ -192,7 +192,7 @@ function dv_include_in_head($location, $params)
   echo <<< END
 <link type="text/css" rel="stylesheet" href="$g_root_url/modules/data_visualization/global/css/visualizations.css">
 <script src="https://www.google.com/jsapi"></script>
-<script src="$g_root_url/modules/data_visualization/global/scripts/visualizations.js"></script>
+<script src="$g_root_url/modules/data_visualization/global/scripts/visualizations.js?v=2"></script>
 <script>
 $(function() {
   $(".dv_vis_tile_enlarge").live("click", dv_ns.enlarge_visualization);

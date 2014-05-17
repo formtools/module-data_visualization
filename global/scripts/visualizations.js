@@ -55,6 +55,8 @@ $(function() {
         if (dv_ns.selected_vis_id == json.vis_id) {
           dv_ns.redraw_full_screen_visualization(json.vis_id);
         }
+        // recreate the thumbnail visualization
+        dv_ns.get_visualization_response(json);
       },
       error: function(a, b, c) {
         $("#dv_vis_refresh_cache").css("background", "transparent url(" + g.root_url + "/modules/data_visualization/images/refresh.png) no-repeat center center");
