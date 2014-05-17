@@ -468,6 +468,22 @@ var settings = {
 }
 END;
       }
+      if ($vis_type == "field")
+      {
+        $colour = $vis_info["vis_colour"];
+        if (isset($overridden_settings["colour"]))
+          $colour = $overridden_settings["colour"];
+        $js_lines[] =<<< END
+var chart = new google.visualization.ColumnChart(document.getElementById("dv_vis_{$vis_id}_{$id_suffix}"));
+var settings = {
+  width:  $width,
+  height: $height,
+  colors: ["$colour"],
+  title: '$title',
+  legend: 'none'
+}
+END;
+      }
       break;
 
     case "bar_chart":
