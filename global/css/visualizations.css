@@ -1,0 +1,118 @@
+/* the default state styles for the visualization tiles in the dialog window. Width and height
+   are set by  */
+#dv_visualization_dialog {
+	padding: 6px;
+}
+#dv_vis_tiles {
+  list-style: none;
+  padding: 0px;
+	margin: 0px;
+}
+#dv_vis_tiles li {
+  background: transparent url(../../../../global/images/loading.gif) no-repeat center center;
+  border: 1px solid #cccccc;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  float: left;
+  margin: 0px 6px 6px 0px;
+  padding: 2px;
+}
+.dv_vis_tile_heading {
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  height: 21px;
+  padding: 0px 0px 1px 4px;
+  background-color: #efefef;
+}
+.dv_vis_tile_enlarge {
+	float: right;
+  width: 21px;
+  height: 21px;
+  padding-bottom: 1px;
+  background: #efefef url(../../../../global/images/open_new_window.png) no-repeat center center;
+	-webkit-border-top-right-radius: 4px;
+	-webkit-border-bottom-right-radius: 4px;
+	-moz-border-radius-topright: 4px;
+	-moz-border-radius-bottomright: 4px;
+	border-top-right-radius: 4px;
+	border-bottom-right-radius: 4px;
+	cursor: pointer;
+}
+.dv_vis_tile_enlarge:hover {
+  background: #cccccc url(../../../../global/images/open_new_window.png) no-repeat center center;
+}
+
+.ui-widget-header span.light_grey {
+  color: #efefef;
+  margin-left: 5px;
+}
+
+.ui-widget-header span.vis_name {
+  color: #cccccc;
+  margin-left: 5px;
+}
+
+#dv_vis_bottom_row {
+  display: none;
+  margin-top:12px
+}
+
+#dv_vis_full_nav ul {
+  list-style: none;
+  margin: 0px;
+  padding: 0px;
+}
+#dv_vis_full_nav ul li {
+  float: left;
+}
+#dv_vis_full_nav ul li.prev {
+	text-align: left;
+	margin-right: 8px;
+}
+#dv_vis_full_nav ul li.prev span {
+  width: 60px;
+}
+#dv_vis_full_nav ul li.next {
+/*	text-align: right; */
+}
+#dv_vis_full_nav ul li.next span {
+  width: 60px;
+}
+#dv_vis_full_nav ul li.back {
+  text-align: center;
+  margin-right: 8px;
+}
+#dv_vis_full_nav ul li span {
+	padding: 2px 10px;
+  background-color: #efefef;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  cursor: pointer;
+}
+#dv_vis_full_nav ul li span.none {
+	background-color: #ffffff;
+	color: #cccccc;
+	cursor: auto;
+}
+#dv_vis_full_nav ul li span:hover {
+	background-color: #cccccc;
+}
+#dv_vis_full_nav ul li span.none:hover {
+  background-color: #ffffff;
+}
+
+.dv_vis_tile_title {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+#dv_vis_cache_info {
+  float: right;
+  color: #999999;
+}
+#dv_vis_cache_info span {
+  color: #aaaaaa;
+}
