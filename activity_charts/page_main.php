@@ -10,9 +10,6 @@ END;
 
 $page_vars["head_js"] =<<< END
 $(function() {
-  $("#form_id").bind("change", function() {
-    vis_ns.select_form(this.value, false);
-  });
   $("#delete_visualization").bind("click", function() {
     vis_ns.delete_visualization($vis_id);
   });

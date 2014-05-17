@@ -15,13 +15,15 @@
 
   {include file='messages.tpl'}
 
+  {include file="../../modules/data_visualization/no_internet_connection.tpl"}
+
   <div class="margin_bottom_large">
     {$L.text_default_activity_chart_settings_page}
   </div>
 
   <form method="post" action="{$same_page}">
 
-    <table cellspacing="0" cellpadding="0" width="100%">
+    <table cellspacing="0" cellpadding="0" width="100%" class="margin_bottom_large">
     <tr>
       <td valign="top">
 
@@ -68,7 +70,6 @@
         <tr>
           <td class="pad_left_small">{$L.phrase_line_width}</td>
           <td>
-            {* TODO {if $module_settings.activity_chart_default_chart_type == "column_chart"}disabled="disabled"{/if} *}
             {line_width_dropdown name_id="line_width" default=$module_settings.activity_chart_line_width} px
             <div class="hint">This is for Line and Area charts only.</div>
           </td>
@@ -80,6 +81,9 @@
       </td>
     </tr>
     </table>
+
+    <div class="subtitle underline margin_bottom_large">{$L.phrase_full_size_example|upper}</div>
+    <div id="full_size_chart"></div>
 
     <p>
       <input type="submit" name="update" value="{$LANG.word_update}" />

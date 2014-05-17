@@ -22,7 +22,7 @@
       <li><a href="../">{$L.phrase_list_visualizations}</a></li>
       <li><a href="add.php">{$L.phrase_create_new_field_chart}</a></li>
       {if $g_success}
-        <li><a href="edit.php?vis_id={$vis_id}">{$L.phrase_edit_field_chart}</a></li>
+        <li><a href="edit.php?vis_id={$vis_id}">{$L.phrase_edit_this_field_chart}</a></li>
       {/if}
       {if $form_id && $view_id}
         <li><a href="../../../admin/forms/submissions.php?form_id={$form_id}&view_id={$view_id}">{$L.phrase_view_form_submissions}</a></li>
@@ -33,11 +33,13 @@
 
     {include file="messages.tpl"}
 
+    {include file="../../modules/data_visualization/no_internet_connection.tpl"}
+
     <div class="margin_bottom_large">
       {$L.text_add_visualization}
     </div>
 
-	  <form action="{$same_page}" method="post">
+	  <form action="{$same_page}" method="post" onsubmit="return rsv.validate(this, rules)">
 
 	    <div class="subtitle underline margin_bottom_large">{$LANG.phrase_main_settings|upper}</div>
 
@@ -66,7 +68,7 @@
         <td class="pad_left_small">{$LANG.word_field}</td>
         <td>
           <select name="field_id" id="field_id" disabled>
-            <option value="">{$LANG.phrase_please_select_form}</option>
+            <option value="">{$L.phrase_please_select_view}</option>
           </select>
         </td>
       </tr>
@@ -108,7 +110,6 @@
             <td class="pad_left_small">{$L.word_colour}</td>
             <td>
               <input type="hidden" name="colour_old" value="{$module_settings.field_chart_colour}" />
-              {* TODO: on page load {$module_settings.field_chart_default_chart_type == "pie_chart"}disabled{/if}  *}
               {colour_dropdown name_id="colour" default=$module_settings.field_chart_colour}
             </td>
           </tr>

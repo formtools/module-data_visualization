@@ -3,8 +3,6 @@
 require_once("../../../../global/library.php");
 ft_init_module_page("client");
 
-// TODO permissions
-
 // the action to take and the ID of the page where it will be displayed (allows for
 // multiple calls on same page to load content in unique areas)
 $request = array_merge($_POST, $_GET);
@@ -41,11 +39,24 @@ switch ($action)
     echo "{ \"success\": true, \"form_id\": $form_id, \"fields\": " . $js_array . " }";
     break;
 
+  case "get_view_fields":
+    $view_id = $request["view_id"];
+    $view_fields = ft_get_view_fields($view_id);
+
+    $js_info = array();
+    foreach ($view_fields as $field_info)
+      $js_info[] = "[{$field_info["field_id"]}, \"" . htmlspecialchars($field_info["field_title"], ENT_QUOTES) . "\"]";
+
+    $js_array = "[" . join(", ", $js_info) . "]";
+
+    echo "{ \"success\": true, \"view_id\": $view_id, \"fields\": " . $js_array . " }";
+    break;
+
   case "get_visualization":
-  	$vis_id = $request["vis_id"];
-  	$vis_data = dv_get_visualization_for_display($vis_id);
+    $vis_id = $request["vis_id"];
+    $vis_data = dv_get_visualization_for_display($vis_id);
     echo ft_convert_to_json($vis_data);
-  	break;
+    break;
 
   case "get_activity_chart_data":
     $form_id    = $request["form_id"];
@@ -65,9 +76,9 @@ switch ($action)
     echo ft_convert_to_json($data);
     break;
 
-  	// permissions. Small security hole, but it IS one
+   // permissions. Small security hole, but it IS one
   case "get_menu":
-  	$menu_id = $request["menu_id"];
+    $menu_id = $request["menu_id"];
     $menu_info = ft_get_menu($menu_id);
 
     $html = "<select id=\"menu_position\">"
@@ -77,18 +88,25 @@ switch ($action)
 
     foreach ($menu_info["menu_items"] as $menu_item)
     {
-    	$prefix = ($menu_item["is_submenu"] == "yes") ? "&#8212; " : "";
+      $prefix = ($menu_item["is_submenu"] == "yes") ? "&#8212; " : "";
       $html .= "<option value=\"{$menu_item["list_order"]}\">{$prefix}{$menu_item["display_text"]}</option>";
     }
     $html .= "</optgroup>"
           . "</select>";
 
     echo $html;
-  	break;
+    break;
 
   case "create_page_and_menu_item":
-  	$result = dv_create_page_and_menu_item($request);
+    $result = dv_create_page_and_menu_item($request);
     echo ft_convert_to_json($result);
-  	break;
+    break;
+
+  case "clear_visualization_cache":
+    $vis_id = $request["vis_id"];
+    dv_clear_visualization_cache($vis_id);
+    $vis_data = dv_get_visualization_for_display($vis_id);
+    echo ft_convert_to_json($vis_data);
+    break;
 }
 

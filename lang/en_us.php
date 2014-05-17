@@ -4,7 +4,7 @@ $L = array();
 
 // required fields
 $L["module_name"] = "Data Visualization";
-$L["module_description"] = "This module utilizes Google Charts API to create custom graphs and charts of your form submission data, providing an alternative, visual interpretation of your data sets.";
+$L["module_description"] = "This module utilizes Google Charts API to create custom graphs and charts of your form submission data, providing an alternative, visual interpretation of your data.";
 
 $L["word_visualizations"] = "Visualizations";
 $L["word_appearance"] = "Appearance";
@@ -54,6 +54,7 @@ $L["phrase_view_visualizations"] = "View Visualizations";
 $L["phrase_create_new_activity_chart"] = "New Activity Chart";
 $L["phrase_activity_chart_settings"] = "Activity Chart Settings";
 $L["phrase_edit_activity_chart"] = "Edit Activity Chart";
+$L["phrase_edit_the_activity_chart"] = "Edit the Activity Chart";
 $L["phrase_field_chart"] = "Field Chart";
 $L["phrase_field_charts"] = "Field Charts";
 $L["phrase_delete_visualization"] = "Delete Visualization";
@@ -147,12 +148,20 @@ $L["phrase_include_legend_in_full_size"] = "Include legend in full size";
 $L["phrase_select_form_and_field"] = "(select form and field)";
 $L["phrase_list_visualizations"] = "List visualizations";
 $L["phrase_create_new_field_chart"] = "Create a new Field Chart";
-//$L["phrase_edit_field_chart"] = "Edit the Field Chart";
 $L["phrase_view_form_submissions"] = "View this form's submissions";
 $L["phrase_thumbnail_example"] = "Thumbnail Example";
 $L["phrase_full_size_example"] = "Full Size Example";
 $L["phrase_default_settings"] = "Default Settings";
 $L["phrase_delete_visualization"] = "Delete Visualization";
+$L["phrase_prev_arrow"] = "&laquo; prev";
+$L["phrase_next_arrow"] = "next &raquo;";
+$L["phrase_back_to_vis_list"] = "back to visualization list";
+$L["phrase_last_cached_c"] = "Last cached: ";
+$L["phrase_clear_visualization_cache"] = "Clear Visualization Cache";
+$L["phrase_create_a_new_activity_chart"] = "Create a new Activity Chart";
+$L["phrase_not_cached"] = "Not cached";
+$L["phrase_please_select_view"] = "Please select a View";
+$L["phrase_edit_this_field_chart"] = "Edit this Field Chart";
 
 $L["text_pages_module_intro"] = "This module is compatible with the Pages module. You can embed any visualization into a Page by copying and pasting the code below - or, just click the button below to automatically create and configure a new page containing this visualization.";
 $L["text_no_visualizations"] = "There are no visualizations set up yet. Click the button below to get started!";
@@ -169,6 +178,7 @@ $L["text_create_page_desc"] = "This is a simple time-saving feature. It does all
 $L["text_default_field_chart_settings_page"] = "This page lets you choose the default display settings for your Field Charts. Field Charts graph the content of a single one of your form fields to show how the contents are distributed. All of these settings may be optionally overridden for any Field Chart.";
 $L["text_default_activity_chart_settings_page"] = "Activity Charts display the frequency of your form submissions in Line, Area or Column Charts. This page lets you choose the default settings for this type of visualization. To create an Activity Chart for one of your forms, return to the main <a href=\"../\">Data Visualizations</a> page and click the Create New Visualization button.";
 $L["text_add_visualization"] = "Use the form below to construct your visualization. After it has been created, you can edit it for additional settings, and to find out how to embed the visualization in your own pages and in pages created by the Pages module.";
+$L["text_bar_and_col_charts_only"] = "Bar and Column Charts only.";
 
 $L["validation_no_form_id"] = "Please select a form.";
 $L["validation_no_view_id"] = "Please select a View.";
@@ -180,6 +190,7 @@ $L["validation_no_dialog_height"] = "Please enter the quicklinks dialog height."
 $L["validation_invalid_dialog_height"] = "Please only enter numbers for the quicklinks dialog height.";
 $L["validation_no_visualization_thumb_size"] = "Please enter the visualization thumbnail size.";
 $L["validation_no_default_thumb_size"] = "Please only enter numbers for the quicklinks dialog thumbnail size.";
+$L["validation_no_field_id"] = "Please select the field you wish to visualize.";
 
 $L["notify_visualization_added"] = "The visualization has been added.";
 $L["notify_visualization_not_added"] = "There was an error adding the visualization.";
@@ -189,7 +200,9 @@ $L["notify_error_creating_activity_chart"] = "There was a problem creating this 
 $L["notify_field_chart_created"] = "The Field Chart has been created.";
 $L["notify_error_creating_field_chart"] = "There was a problem creating this Field Chart. Please report this problem in the forums.";
 $L["notify_activity_chart_updated"] = "The Activity Chart has been updated.";
+$L["notify_field_chart_updated"] = "The Field Chart has been updated.";
 $L["notify_error_updating_activity_chart"] = "There was a problem updating this Activity Chart. Please report this problem in the forums.";
+$L["notify_error_updating_field_chart"] = "There was a problem updating this Field Chart. Please report this problem in the forums.";
 $L["notify_settings_updated"] = "The settings have been updated.";
 $L["notify_vis_deleted"] = "The visualization has been deleted.";
 $L["notify_vis_not_deleted"] = "The visualization was not found and could not be deleted.";
@@ -197,19 +210,9 @@ $L["notify_no_submissions_in_form_view"] = "There are no submissions in the form
 $L["notify_no_submissions_in_form"] = "There are no submissions in the form to which this visualization is assigned.";
 $L["notify_pages_module_not_installed"] = "The Pages module is not installed or enabled, so this section is not relevant.";
 $L["notify_page_created_and_assigned"] = "The page has been created and assigned to your menu.";
+$L["notify_visualization_cache_cleared"] = "The visualization cache has been cleared.";
+$L["notify_specific_visualization_cache_cleared"] = "The cache for this visualization has been cleared.";
+$L["notify_no_internet_connection"] = "Sorry, we cannot load the Google Charts library, which is needed in order for this module to work properly. This is most likely caused by there being no internet connection available.";
 
 $L["confirm_delete_visualization"] = "Are you sure you want to delete this visualization?";
-
-
-
-
-
-
-
-
-
-
-
-
-
 

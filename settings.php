@@ -4,6 +4,11 @@ require_once("../../global/library.php");
 ft_init_module_page();
 $request = array_merge($_POST, $_GET);
 
+if (isset($request["clear_cache"]))
+{
+	list($g_success, $g_message) = dv_clear_visualization_cache();
+}
+
 if (isset($request["update"]))
 {
 	$settings = array(

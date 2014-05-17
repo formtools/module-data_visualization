@@ -22,13 +22,24 @@ if (isset($_GET["reset"]))
   $_GET["client_id"] = "";
 }
 
-$keyword        = ft_load_module_field("data_visualizations", "keyword", "dv_search_keyword", "");
-$search_form_id = ft_load_module_field("data_visualizations", "form_id", "dv_form_id", "");
-$search_view_id = ft_load_module_field("data_visualizations", "view_id", "dv_view_id", "");
-$vis_types      = ft_load_module_field("data_visualizations", "vis_types", "dv_vis_types", array("activity", "field"));
-$chart_type     = ft_load_module_field("data_visualizations", "chart_type", "dv_chart_type", "");
-$account_type   = ft_load_module_field("data_visualizations", "account_type", "dv_account_type", "admin");
-$client_id      = ft_load_module_field("data_visualizations", "client_id", "dv_client_id", "");
+// if we're being linked here from the admin's Submission Listing page (i.e. the user just clicked the "Manage Visualizations" button)
+// reset everything except the form & View
+if (isset($_GET["source"]) && $_GET["source"] == "admin_submission_listing")
+{
+  $_GET["keyword"] = "";
+  $_GET["vis_types"] = array("activity", "field");
+  $_GET["chart_type"] = "";
+  $_GET["account_type"] = "admin";
+  $_GET["client_id"] = "";
+}
+
+$keyword        = ft_load_module_field("data_visualization", "keyword", "dv_search_keyword", "");
+$search_form_id = ft_load_module_field("data_visualization", "form_id", "dv_form_id", "");
+$search_view_id = ft_load_module_field("data_visualization", "view_id", "dv_view_id", "");
+$vis_types      = ft_load_module_field("data_visualization", "vis_types", "dv_vis_types", array("activity", "field"));
+$chart_type     = ft_load_module_field("data_visualization", "chart_type", "dv_chart_type", "");
+$account_type   = ft_load_module_field("data_visualization", "account_type", "dv_account_type", "admin");
+$client_id      = ft_load_module_field("data_visualization", "client_id", "dv_client_id", "");
 
 $search_criteria = array(
   "keyword"      => $keyword,
@@ -53,6 +64,8 @@ foreach ($results as $vis_info)
 	$vis_ids[] = $vis_info["vis_id"];
 }
 $vis_id_str = implode(",", $vis_ids);
+
+$vis_messages = dv_get_vis_messages($L);
 
 // ------------------------------------------------------------------------------------------------
 
@@ -89,14 +102,18 @@ END;
 
 $page_vars["head_js"] =<<< END
 $(function() {
+  if (typeof google == "undefined") {
+    $("#no_internet_connection").show();
+    $("#view_visualizations").hide();
+  }
   dv_ns.context = "manage_visualizations";
-
   $("#view_visualizations").bind("click", dv_ns.show_visualizations_dialog);
   $(".dv_vis_tile_enlarge").live("click", dv_ns.enlarge_visualization);
   $("#dv_vis_full_nav li.back span").live("click", dv_ns.return_to_overview);
   $("#dv_vis_full_nav li.prev span").live("click", dv_ns.show_prev_visualization);
   $("#dv_vis_full_nav li.next span").live("click", dv_ns.show_next_visualization);
 
+  $("#client_id").bind("change", function() { $("#at2").attr("checked", "checked"); });
   $("#search_form form").bind("submit", function() {
     var errors = [];
     if (!$("#vt1").attr("checked") && !$("#vt2").attr("checked")) {
@@ -139,18 +156,11 @@ $(function() {
   vis_ns.default_view_label = "{$L["phrase_all_views"]}";
 });
 
-// TODO. Move this to common function, used by both this page & include_in_head function
-
 g.quicklinks_dialog_width = {$module_settings["quicklinks_dialog_width"]};
 g.quicklinks_dialog_height = {$module_settings["quicklinks_dialog_height"]};
 g.vis_tile_size = {$module_settings["quicklinks_dialog_thumb_size"]};
 
-g.vis_messages = {};
-g.vis_messages.word_visualizations = "{$L["word_visualizations"]}";
-g.vis_messages.word_close = "{$LANG["word_close"]}";
-g.vis_messages.phrase_manage_visualizations = "{$L["phrase_manage_visualizations"]}";
-g.vis_messages.word_visualizations = "{$L["word_visualizations"]}";
-g.vis_messages.phrase_edit_visualization = "{$L["phrase_edit_visualization"]}";
+$vis_messages
 
 g.vis_ids = [$vis_id_str];
 $js

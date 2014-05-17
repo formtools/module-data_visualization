@@ -12,11 +12,9 @@
 .visualization_field_list .col2 select {
   width: 313px;
 }
-
 #create_visualization_dialog {
   overflow-x: hidden;
 }
-
 #create_visualization_dialog ul {
 	margin: 0px;
 	padding: 0px;
@@ -56,8 +54,6 @@
   border-radius: 4px;
   background-color: #efefef;
 }
-
-
 #full_size_chart div.loading {
   width: 692px;
   height: 300px;
@@ -74,4 +70,7 @@
   list-style: none;
   margin: 0px;
   padding: 0px;
+}
+#no_internet_connection {
+  display: none;
 }

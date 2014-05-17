@@ -30,10 +30,18 @@ $page_vars["head_string"] =<<< END
 END;
 
 $page_vars["head_js"] =<<< END
-google.load("visualization", "1", {packages:["corechart"]});
+if (typeof google != "undefined") {
+  google.load("visualization", "1", {packages:["corechart"]});
+}
 
 $(function() {
+  if (typeof google == "undefined") {
+    $("#no_internet_connection").show();
+  }
   vis_ns.redraw_activity_chart();
+  if ($("input[name=chart_type]:checked").val() == "column_chart") {
+    $("#line_width").attr("disabled", "disabled");
+  }
 
   $("#form_id, #date_range, input[name=submission_count_group]").bind("change", vis_ns.update_activity_chart_data);
   $("input[name=chart_type], #colour, #line_width").bind("change keyup", vis_ns.redraw_activity_chart);
@@ -52,7 +60,6 @@ $js
 
 var rules = [];
 rules.push("required,form_id,{$L["validation_no_form_id"]}");
-rules.push("required,view_id,{$L["validation_no_view_id"]}");
 END;
 
 ft_display_module_page("templates/activity_charts/add.tpl", $page_vars);

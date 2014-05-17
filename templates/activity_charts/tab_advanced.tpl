@@ -45,7 +45,7 @@ dv_display_visualization(1, $width, $height);</textarea>
   </div>
 
   <textarea style="width:100%; height: 150px" class="medium_grey">&lt;?php
-require_once("{$g_root_dir}/global/library.php");
+require_once('{$g_root_dir}/global/library.php');
 ft_include_module("data_visualization");
 $width  = 600;
 $height = 300;
@@ -84,9 +84,9 @@ dv_display_visualization({$vis_id}, $width, $height);
   <tr>
     <td class="medium_grey">{$L.phrase_submenu_item}</td>
     <td>
-      <input type="radio" name="is_submenu" id="is1" value="yes" checked />
+      <input type="radio" name="is_submenu" id="is1" value="yes" />
         <label for="is1">{$LANG.word_yes}</label>
-      <input type="radio" name="is_submenu" id="is2" value="no" />
+      <input type="radio" name="is_submenu" id="is2" value="no" checked />
         <label for="is2">{$LANG.word_no}</label>
     </td>
   </tr>

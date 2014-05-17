@@ -32,11 +32,17 @@ $page_vars = array();
 $page_vars["module_settings"] = $module_settings;
 $page_vars["head_string"] =<<< END
   <script src="https://www.google.com/jsapi"></script>
+  <link type="text/css" rel="stylesheet" href="../global/css/styles.css">
 END;
 $page_vars["head_js"] =<<< END
-google.load("visualization", "1", {packages:["corechart"]});
+if (typeof google != "undefined") {
+  google.load("visualization", "1", {packages:["corechart"]});
+}
 
 $(function() {
+  if (typeof google == "undefined") {
+    $("#no_internet_connection").show();
+  }
   draw_graph();
 
   $("input[name=chart_type], input[name=submission_count_group], #colour, #line_width").bind("change keyup", draw_graph);
@@ -50,6 +56,9 @@ $(function() {
   });
 
   function draw_graph() {
+    if (typeof google == "undefined") {
+      return;
+    }
     var colour     = $("#colour").val();
     var chart_type = $("input[name=chart_type]:checked").val();
     var submission_count_group = $("input[name=submission_count_group]:checked").val();
@@ -89,18 +98,39 @@ $(function() {
 
     switch (chart_type) {
       case "line_chart":
-        var chart = new google.visualization.LineChart(document.getElementById("thumb_chart"));
+        var thumb_chart = new google.visualization.LineChart(document.getElementById("thumb_chart"));
+        var full_size_chart = new google.visualization.LineChart(document.getElementById("full_size_chart"));
         break;
       case "area_chart":
-        var chart = new google.visualization.AreaChart(document.getElementById("thumb_chart"));
+        var thumb_chart = new google.visualization.AreaChart(document.getElementById("thumb_chart"));
+        var full_size_chart = new google.visualization.AreaChart(document.getElementById("full_size_chart"));
         break;
       case "column_chart":
-        var chart = new google.visualization.ColumnChart(document.getElementById("thumb_chart"));
+        var thumb_chart = new google.visualization.ColumnChart(document.getElementById("thumb_chart"));
+        var full_size_chart = new google.visualization.ColumnChart(document.getElementById("full_size_chart"));
         break;
     }
 
-    if (chart) {
-      chart.draw(data, { width: 250, height: 160, title: 'Example Form', legend: "none", colors: [colour], lineWidth: line_width });
+    if (thumb_chart) {
+      var thumb_settings = {
+        width:  250,
+        height: 160,
+        title:  'Example Form',
+        legend: 'none',
+        colors: [colour],
+        lineWidth: line_width
+      };
+      var full_size_settings = {
+        width:  730,
+        height: 350,
+        title:  'Example Form',
+        legend: 'none',
+        colors: [colour],
+        lineWidth: line_width
+      };
+
+      thumb_chart.draw(data, thumb_settings);
+      full_size_chart.draw(data, full_size_settings);
     }
   }
 });

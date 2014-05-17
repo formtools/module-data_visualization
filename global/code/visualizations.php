@@ -217,11 +217,26 @@ function dv_search_visualizations($search_criteria)
 }
 
 
-function dv_clear_visualization_cache($vis_id)
+/**
+ * Clears the cache for an individual Visualization, or ALL visualizations.
+ *
+ * @param integer $vis_id
+ */
+function dv_clear_visualization_cache($vis_id = "")
 {
-	global $g_table_prefix;
+	global $g_table_prefix, $L;
 
-  @mysql_query("DELETE FROM {$g_table_prefix}module_data_visualization_cache WHERE vis_id = $vis_id");
+	$message      = $L["notify_visualization_cache_cleared"];
+	$where_clause = "";
+	if (!empty($vis_id))
+	{
+    $where_clause = "WHERE vis_id = $vis_id";
+    $message = $L["notify_specific_visualization_cache_cleared"];
+	}
+
+	@mysql_query("DELETE FROM {$g_table_prefix}module_data_visualization_cache $where_clause");
+
+	return array(true, $message);
 }
 
 
@@ -331,11 +346,11 @@ function dv_display_in_pages_module($location, $params)
   $height = $attributes["height"];
   $width  = $attributes["width"];
 
-  dv_display_visualization($vis_id, $height, $width);
+  dv_display_visualization($vis_id, $width, $height);
 }
 
 
-function dv_display_visualization($vis_id, $height, $width)
+function dv_display_visualization($vis_id, $width, $height)
 {
   $vis_info = dv_get_visualization_for_display($vis_id);
   $vis_type   = $vis_info["vis_type"];
@@ -347,7 +362,7 @@ function dv_display_visualization($vis_id, $height, $width)
   $js_lines = array();
   for ($i=0; $i<count($vis_info["data"]); $i++)
   {
-    $label = $vis_info["data"][$i]["label"];
+    $label = addslashes($vis_info["data"][$i]["label"]);
     $data  = $vis_info["data"][$i]["data"];
     $js_lines[] = "data.setValue($i, 0, \"$label\");";
     $js_lines[] = "data.setValue($i, 1, $data);";
@@ -362,9 +377,9 @@ function dv_display_visualization($vis_id, $height, $width)
       $js_lines[] =<<< END
 var chart = new google.visualization.$chart_class(document.getElementById("dv_vis_{$vis_id}"));
 var settings = {
-  width:  $width,
+  width: $width,
   height: $height,
-  color: "{$vis_info["vis_colour"]}",
+  colors: ["{$vis_info["vis_colour"]}"],
   lineWidth: {$vis_info["line_width"]},
   title: '$title',
   legend: 'none'
@@ -381,7 +396,7 @@ var chart = new google.visualization.ColumnChart(document.getElementById("dv_vis
 var settings = {
   width:  $width,
   height: $height,
-  color: "{$vis_info["vis_colour"]}",
+  colors: ["{$vis_info["vis_colour"]}"],
   lineWidth: {$vis_info["line_width"]},
   title: '$title',
   legend: 'none'
@@ -429,7 +444,7 @@ google.load("visualization", "1", {packages:["corechart"]});
 google.setOnLoadCallback(vis_drawChart);
 function vis_drawChart() {
   var data = new google.visualization.DataTable();
-  data.addColumn("string", "...");
+  data.addColumn("string", "");
   data.addColumn("number", "Submissions");
   data.addRows($num_rows);
   $js_lines_str
@@ -447,13 +462,13 @@ END;
  */
 function dv_get_tabset_links($vis_id)
 {
-	$keyword        = ft_load_module_field("data_visualizations", "keyword", "dv_search_keyword", "");
-	$search_form_id = ft_load_module_field("data_visualizations", "form_id", "dv_form_id", "");
-	$search_view_id = ft_load_module_field("data_visualizations", "view_id", "dv_view_id", "");
-	$vis_types      = ft_load_module_field("data_visualizations", "vis_types", "dv_vis_types", array("activity", "field"));
-	$chart_type     = ft_load_module_field("data_visualizations", "chart_type", "dv_chart_type", "");
-	$account_type   = ft_load_module_field("data_visualizations", "account_type", "dv_account_type", "admin");
-	$client_id      = ft_load_module_field("data_visualizations", "client_id", "dv_client_id", "");
+	$keyword        = ft_load_module_field("data_visualization", "keyword", "dv_search_keyword", "");
+	$search_form_id = ft_load_module_field("data_visualization", "form_id", "dv_form_id", "");
+	$search_view_id = ft_load_module_field("data_visualization", "view_id", "dv_view_id", "");
+	$vis_types      = ft_load_module_field("data_visualization", "vis_types", "dv_vis_types", array("activity", "field"));
+	$chart_type     = ft_load_module_field("data_visualization", "chart_type", "dv_chart_type", "");
+	$account_type   = ft_load_module_field("data_visualization", "account_type", "dv_account_type", "admin");
+	$client_id      = ft_load_module_field("data_visualization", "client_id", "dv_client_id", "");
 
 	$search_criteria = array(
 	  "keyword"      => $keyword,
@@ -517,3 +532,83 @@ function dv_get_tabset_links($vis_id)
   return $return_info;
 }
 
+
+/**
+ * Called on the Advanced tab of the Edit Field Chart and Edit Activity Chart pages. It creates a new
+ * Page in the Pages module and assigns that page to a menu.
+ *
+ * @param array $request
+ */
+function dv_create_page_and_menu_item($request)
+{
+	global $g_table_prefix;
+
+  $vis_id        = $request["vis_id"];
+  $page_title    = $request["page_title"];
+  $menu_id       = $request["menu_id"];
+  $menu_position = $request["menu_position"];
+  $is_submenu    = $request["is_submenu"];
+
+  ft_include_module("pages");
+  $content = "<div style=\"border:1px solid #cccccc\">{template_hook location=\"data_visualization\" vis_id=$vis_id height=400 width=738}</div>";
+
+  // convert the info to a Pages-module-friendly format
+  $info = array(
+    "page_name"    => $page_title,
+    "heading"      => $page_title,
+    "access_type"  => "public",
+    "content_type" => "smarty",
+    "codemirror_content" => $content,
+    "use_wysiwyg_hidden" => "no"
+  );
+  list($success, $message, $page_id) = pg_add_page($info);
+
+  $menu_info = ft_get_menu($menu_id);
+  $menu_type = $menu_info["menu_type"];
+
+  // now add the new Page to the menu. If it's being added to the administrator's menu, update the cached menu
+  if ($menu_position == "at_start")
+  {
+  	mysql_query("
+  	  UPDATE {$g_table_prefix}menu_items
+  	  SET    list_order = list_order+1
+  	  WHERE  menu_id = $menu_id
+  	");
+
+  	$list_order = 1;
+  }
+  else if ($menu_position == "at_end")
+  {
+    $list_order = count($menu_info["menu_items"]) + 1;
+  }
+  else
+  {
+    mysql_query("
+      UPDATE {$g_table_prefix}menu_items
+      SET    list_order = list_order+1
+      WHERE  menu_id = $menu_id AND
+             list_order > $menu_position
+    ");
+    $list_order = $menu_position+1;
+  }
+
+  $display_text = ft_sanitize($page_title);
+  mysql_query("
+    INSERT INTO {$g_table_prefix}menu_items (menu_id, display_text, page_identifier, url, is_submenu, is_new_sort_group, list_order)
+    VALUES ($menu_id, '$display_text', 'page_{$page_id}', '/modules/pages/page.php?id=$page_id', '$is_submenu', 'yes', $list_order)
+  ");
+
+  if ($menu_type == "admin")
+  {
+  	$account_id = isset($_SESSION["ft"]["account"]["account_id"]) ? $_SESSION["ft"]["account"]["account_id"] : "";
+    ft_cache_account_menu($account_id);
+  }
+
+  $return_info = array(
+    "success"   => 1,
+    "menu_type" => $menu_type,
+    "page_id"   => $page_id
+  );
+
+  return $return_info;
+}

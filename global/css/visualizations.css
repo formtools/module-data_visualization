@@ -116,3 +116,24 @@
 #dv_vis_cache_info span {
   color: #aaaaaa;
 }
+#dv_vis_refresh_cache {
+  float: right;
+  background: transparent url("../../images/refresh.png") no-repeat center center;
+  margin-left: 6px;
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  border: 1px solid #dddddd;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+#dv_vis_refresh_cache:hover {
+  border: 1px solid #38bd51;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+#no_internet_connection {
+  display: none;
+}

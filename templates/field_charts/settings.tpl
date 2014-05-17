@@ -15,6 +15,8 @@
 
   {include file='messages.tpl'}
 
+  {include file="../../modules/data_visualization/no_internet_connection.tpl"}
+
   <div class="margin_bottom_large">
     {$L.text_default_field_chart_settings_page}
   </div>
@@ -55,7 +57,6 @@
         <tr>
           <td class="pad_left_small">{$L.word_colour}</td>
           <td>
-            {* TODO {if $module_settings.field_chart_default_chart_type == "pie_chart"}disabled="disabled"{/if} *}
             {colour_dropdown name_id="field_chart_colour" default=$module_settings.field_chart_colour}
           </td>
         </tr>

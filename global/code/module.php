@@ -1,127 +1,27 @@
 <?php
 
-
-function data_visualization__install($module_id)
-{
-  global $g_table_prefix, $g_root_dir, $g_root_url, $LANG;
-
-  $queries = array();
-  $queries[] = "
-		CREATE TABLE {$g_table_prefix}module_data_visualizations (
-		  vis_id mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
-		  vis_name varchar(255) NOT NULL,
-		  vis_type enum('activity','field') NOT NULL,
-		  chart_type enum('line_chart','area_chart','column_chart','bar_chart','pie_chart') NOT NULL,
-		  form_id mediumint(9) NOT NULL,
-		  view_id mediumint(9) DEFAULT NULL,
-		  field_id mediumint(9) DEFAULT NULL,
-		  access_type enum('admin','public','private') NOT NULL DEFAULT 'public',
-		  access_view_mapping enum('all','except','only') NOT NULL DEFAULT 'all',
-		  access_views mediumtext NOT NULL,
-		  cache_update_frequency varchar(8) NOT NULL,
-		  date_range varchar(20) DEFAULT NULL,
-		  submission_count_group enum('year','month','week','day') DEFAULT NULL,
-		  colour varchar(10) DEFAULT NULL,
-		  line_width tinyint(4) DEFAULT NULL,
-		  field_chart_ignore_empty_fields enum('yes','no') DEFAULT NULL,
-		  pie_chart_format enum('2D','3D') DEFAULT NULL,
-		  include_legend_quicklinks enum('yes','no') DEFAULT NULL,
-		  include_legend_full_size enum('yes','no') DEFAULT NULL,
-		  PRIMARY KEY (vis_id)
-		) DEFAULT CHARSET=utf8
-  ";
-
-  $queries[] = "
-		CREATE TABLE {$g_table_prefix}module_data_visualization_cache (
-		  vis_id mediumint(8) unsigned NOT NULL,
-		  last_cached datetime NOT NULL,
-		  `data` mediumtext NOT NULL,
-		  PRIMARY KEY (vis_id)
-		) DEFAULT CHARSET=utf8
-  ";
-
-  $queries[] = "
-		CREATE TABLE {$g_table_prefix}module_data_visualization_clients (
-		  vis_id mediumint(8) unsigned NOT NULL,
-		  account_id mediumint(8) unsigned NOT NULL,
-		  PRIMARY KEY (vis_id,account_id)
-		) DEFAULT CHARSET=utf8
-  ";
-
-  foreach ($queries as $query)
-  {
-    $result = mysql_query($query);
-    if (!$result)
-    {
-      return array(false, $LANG["data_visualization"]["notify_installation_problem_c"] . " <b>" . mysql_error() . "</b>");
-    }
-  }
-
-  ft_register_hook("template", "data_visualization", "admin_submission_listings_top", "", "dv_display_visualization_icon", 50, true);
-  ft_register_hook("code", "data_visualization", "main", "ft_display_submission_listing_quicklinks", "dv_add_quicklink", 50, true);
-  ft_register_hook("template", "data_visualization", "head_bottom", "", "dv_include_in_head", 50, true);
-  ft_register_hook("code", "data_visualization", "start", "ft_delete_form", "dv_delete_form_hook", 50, true);
-
-  // a custom hook for use in Smarty pages generated via the Pages module
-  ft_register_hook("template", "data_visualization", "data_visualization", "", "dv_display_in_pages_module", 50, true);
-
-  $settings = array(
-
-    // main settings
-    "quicklinks_dialog_width"      => 876,
-    "quicklinks_dialog_height"     => 400,
-    "quicklinks_dialog_thumb_size" => 200,
-    "default_cache_frequency"      => 30,
-
-    // Activity Chart default settings
-    "activity_chart_date_range"               => "last_30_days",
-    "activity_chart_submission_count_group"   => "day",
-    "activity_chart_default_chart_type"       => "line_chart",
-    "activity_chart_colour"                   => "blue",
-    "activity_chart_line_width"               => 2,
-
-    // Field Chart default settings
-    "field_chart_default_chart_type"          => "pie_chart",
-    "field_chart_include_legend_quicklinks"   => "no",
-    "field_chart_colour"                      => "blue",
-    "field_chart_include_legend_full_size"    => "yes",
-    "field_chart_pie_chart_format"            => "2D",
-    "field_chart_ignore_empty_fields"         => "yes"
-  );
-  ft_set_settings($settings, "data_visualization");
-
-  return array(true, "");
-}
-
-
-function data_visualization__uninstall($module_id)
-{
-  global $g_table_prefix;
-
-  mysql_query("DROP TABLE {$g_table_prefix}module_data_visualizations");
-  mysql_query("DROP TABLE {$g_table_prefix}module_data_visualization_cache");
-  mysql_query("DROP TABLE {$g_table_prefix}module_data_visualization_clients");
-  return array(true, "");
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/**
+ * According to the Terms of Service, this file may not be de-obfuscated or edited.
+ * http://modules.formtools.org/license_agreement.php
+ *
+ * @copyright Encore Web Studios 2011
+ */
+function data_visualization__install($module_id){global $g_table_prefix, $g_root_dir, $g_root_url, $LANG;$success = "";$message = "";$encrypted_key = isset($_POST["ek"]) ? $_POST["e\x6b"] : "";$module_key= isset($_POST["\x6b"]) ? $_POST["k"] : "";if (empty($encrypted_key) || empty($module_key) || $encrypted_key != crypt($module_key, "j\x6a")){$success = false;}else{ $success = true; $queries = array(); $table1 = $g_table_prefix . "mo\x64\x75\154\145\137\x64\141\164\141\137vi\163\x75a\154i\172a\164\x69\x6f\156s"; $queries[] = "\015
+	\x09	\x43\x52\105AT\x45 TA\102LE\x20$table1\x20(\015
+\011\x09\011\x20\040\166\151\163\137\151\x64 \x6de\144\x69u\155\151\156t\x288\051\040\165\156\163\x69gn\145\144 \x4eOT\040\x4e\x55\x4cL \101U\x54\117_\111N\103\122\105\x4d\x45\116\x54\x2c\x0d
+			\040\040v\151\x73\137\156a\x6de\040va\162\x63har\x282\x355) \x4e\117T N\125\x4c\x4c\x2c\015\012			 \x20\x76\151\163\x5f\164\x79\160\145 \145nu\155\x28'act\x69\166\151\x74y'\054'\x66\151el\144'\051 \x4e\x4f\124\040\116\125\114L,\015
+	\011	\040\x20c\150\x61\x72\164\137\164ype\x20\x65\x6eu\x6d\050'\154i\156\x65_\143ha\x72\164','\141\x72\x65\x61_\143\x68art','co\x6cum\x6e_c\150\x61r\x74','\x62\141\x72\x5f\143h\141rt','\160i\x65\x5fch\x61r\164'\051 N\117\124 N\125LL\054\015\x0a\011\x09	 \x20\146o\x72\x6d\x5fi\144 \155\x65\144i\x75\155\151n\164(\071)\x20NOT \116\x55\x4c\x4c\054\015
+\x09\011	\040 \x76\x69\x65\x77_\151d\040\155edi\x75\x6d\151n\x74\050\x39\051 \104\x45\106\101\125\114\x54 N\125L\114,\x0d\012\011\011\011 \040\x66i\x65\x6c\144_\x69d m\x65\144\151\165\x6di\x6e\164\x289\x29\040\104EFA\125\114\124\x20NU\x4c\114\x2c\015\x0a\x09\x09\x09\x20 \141c\x63e\163s\x5ft\171p\x65 \145nu\x6d('adm\x69\x6e','\160\x75\142l\151\143'\054'pr\151\166a\x74\145'\051\x20N\117\x54\x20\116\125LL \x44\x45\106A\x55\x4cT\x20'\x70\x75\142li\143'\054\015\x0a\011\x09\x09\040\x20a\143c\x65s\163_v\151\145\x77_\x6d\x61p\160ing \x65n\x75m\050'\x61ll'\x2c'e\x78c\x65\160\164'\x2c'\x6f\x6el\x79'\051\x20\116\117T\x20\116U\x4c\114\040\x44\x45\x46A\125\x4c\x54\040'\x61\154\x6c',\015\x0a\x09\x09	\x20\040a\x63\143\145\163s_v\151\x65\167\163 \155\x65\x64\151\165\x6d\164\x65\x78\x74\040\116O\x54\x20\x4e\125\x4c\114,\x0d\x0a\x09\011\x09 \040c\141c\150\x65\137u\160d\141\x74\145_\146r\x65\161u\x65\x6e\143\x79\040\166\141\162\x63\x68\141\162(\x38) \116O\x54\040\116\x55\x4c\114\x2c\x0d\x0a\x09\x09	\040\040\x64\141\164\145\137\162\x61\156\x67\x65\x20\x76a\162\x63h\x61\x72\x282\060) \x44E\106\101\x55L\124\x20N\125LL,\x0d\x0a\011	\x09\x20\040\x73u\142\x6d\151\163\x73\x69\x6f\x6e_\143\157\165\x6e\x74_\x67r\x6fu\160\040\145n\165\x6d\050'\x79\145ar','m\x6f\156\164h'\054'w\145e\x6b','\x64\141y')\040\104\105\x46AULT\x20\116\125\x4c\x4c\054
+\012\x09	\x09\x20\040c\x6flou\162 \166\141\162\x63\150\x61\x72(1\x30)\040\x44\105FAU\x4cT \x4e\x55\114L,
+\x0a\x09	\x09\040\040li\x6ee\x5f\167\x69d\164h\040t\151\x6ey\x69nt\050\064\x29\x20\x44EF\x41UL\x54\x20\x4eU\114\114\x2c\x0d\x0a\011\011\011  \x66\x69\x65l\x64_c\150\x61\162\x74_\151gn\x6f\162\x65\137\145m\160\x74\x79\x5f\x66\x69\145\x6c\144s\040en\x75\155\x28'\171\x65s','n\157'\051\x20\104\x45F\101\125\x4cT\x20\116\125L\x4c\054\015\012\x09		\x20\x20\160i\x65\x5f\x63\x68\x61r\x74\137f\x6frmat \145\156\x75\155\050'\062D'\x2c'\063\x44'\051 \x44EF\x41U\114T\x20\116\x55L\114,\x0d
+\011	\011\040\040\151\x6e\x63\x6cud\x65_\x6ce\x67\145\156d_q\x75\151\x63\x6b\154\151n\153\163\040\145\x6eu\x6d\x28'\x79e\163'\x2c'\156\157')\x20\104\x45\x46\x41\x55\x4cT \x4e\x55L\114\x2c\x0d
+		\x09 \040includ\x65\137leg\x65\x6ed\x5f\x66\x75l\154\x5f\163\x69\172\x65 e\156\x75m('\x79\145\163'\x2c'\x6e\157'\x29 \104\105\x46\101\x55LT \x4e\125\114L,\015\x0a	\011\011 \040\x50\x52I\115A\x52\131\x20\x4b\105Y \050vis\137id\x29
+\x0a\011	\011) \x44\105\106A\x55\x4cT\x20\x43\x48\x41RS\105\x54\x3d\x75\x74f\070\x0d\x0a	  "; $table2 = $g_table_prefix . "\155\157d\165\x6ce_da\164\x61\137v\151s\x75\x61\154\151z\141ti\157\156_\143a\143\x68e"; $queries[] = "\015
+\x09\011\x09C\122\105\101\124\x45\040T\x41\102L\x45\040$table2\x20(\x0d\012\011	\x09\040 \x76\151s\x5fid\040me\144i\165m\x69\156t\x28\070\x29\x20u\x6esig\156\x65\144\040\116\117T\x20\116\125L\114\054\x0d
+\011		\040\x20\154\x61\163\x74\137\143a\143\150\x65d\040\x64a\x74\145\164\x69\x6d\145\x20NO\x54\x20\116\125\114\x4c\054\x0d
+		\x09\040 \x60\144a\164a\x60 \155\145diu\x6dtex\164\040\x4e\117\x54\040\116\125\114\x4c,
+\x0a\x09	\011\040\x20\x50\x52I\115\x41R\131\040\x4b\105\131\040\050v\151\163\x5f\x69d)
+	\x09\011)\x20\104\x45FA\x55\114\x54\x20\x43\110\x41\x52S\x45T\075\x75\x74\x66\x38\015\012	\x20 "; $table3 = $g_table_prefix . "\155\157\x64\x75\154\145_\x64ata_v\x69\163ua\x6c\x69\x7a\x61ti\157\x6e_\143\x6ci\145\x6e\x74\x73"; $queries[] = "
+\012	\011\x09\103REA\124E\x20T\101\102L\105 $table3\x20\x28
+\x0a		\011\040\040\x76\151\163_i\x64\x20\x6d\x65\x64i\165\x6d\151\156\164\050\x38)\x20u\156s\x69g\x6e\x65\144\x20\x4e\x4f\x54 \116\125L\x4c\x2c\015\012\011\011\x09 \x20ac\143\157\x75\156\164\x5fid\040m\x65\x64\151\165\x6d\151\x6et\x288\051\040uns\151\147n\x65d N\x4f\124\x20\x4e\125L\114\x2c\015\x0a\011\x09\011\040\040\x50\122IMA\x52\131\x20KE\131\x20\x28\166i\163\x5fi\144,a\143\143\x6f\165\x6e\x74\x5f\151d)\015
+\011	\011\051\040D\x45\x46\x41U\x4c\x54\040\x43H\101\122\123\105\124=\165\164f\x38\x0d\012	\040\040"; foreach ($queries as $query) { $result = mysql_query($query); if (!$result) { return array(false, $LANG["d\x61ta\x5f\x76is\165a\154\x69\172\x61\164io\156"]["\x6e\x6f\164\x69\x66y\137\151\x6e\x73\x74a\x6c\x6ca\164i\157\x6e\x5f\x70r\157\142\154\145\x6d\137c"] . "\x20\x3c\x62\x3e" . mysql_error() . "\x3c/b>"); } } ft_register_hook("tem\x70la\164e", "da\x74a\137\x76\151s\165\141l\x69\172a\x74\151\157\x6e", "\141\x64\155i\x6e\137s\165\142\155i\x73\163i\x6fn\137l\x69s\164i\x6egs\x5f\x74o\x70", "", "\x64\166\x5f\144\x69\x73p\x6ca\171\137\x76\151\163\165a\x6ciz\141\x74\151\157n\x5f\151c\x6f\x6e", 50, true); ft_register_hook("\143o\144e", "d\x61\164\141_\166i\163\x75\x61\x6c\x69\x7a\x61ti\x6fn", "\155\141\x69n", "\146\164_\144i\x73p\x6c\x61y\137s\x75\142\x6d\151\163\163\151\x6fn_\x6c\151\163\164\x69\156\147\137\x71\x75ic\153\x6cin\x6b\163", "\144\166\137\x61\x64\x64\x5f\x71\165\151\x63\153l\x69\156k", 50, true); ft_register_hook("\x74\145mp\x6ca\164\145", "d\x61\164\x61\137vi\163\165a\x6c\151\172\141t\x69\x6fn", "h\x65a\144\137bott\157m", "", "\x64\166\x5f\151nclu\144e\137i\x6e_\x68\145\x61d", 50, true); ft_register_hook("c\157\144e", "d\141t\141\x5f\166\151\x73ua\154\x69\172a\x74i\x6fn", "s\164\x61r\x74", "ft_\x64\145\x6c\x65te\x5f\146or\155", "\x64\x76\137\144\145l\145\x74e_\146\x6frm_h\157\157k", 50, true);ft_register_hook("te\x6d\160l\x61te", "\x64a\164\141\137v\x69s\x75\x61\154i\x7a\141t\x69o\156", "\x64\141\164\141_\x76\151\163ua\154iz\141\x74\151\x6f\x6e", "", "dv_d\x69\163\x70l\141y\x5fi\x6e\137\x70\x61g\x65\x73\137\x6d\x6f\x64\x75\x6c\145", 50, true); $settings = array("q\x75\x69c\153\x6c\151\156\153\163_\x64\x69\141\154\x6f\147_\167\x69\144\x74\x68"=> 880, "\x71\x75\151\x63\x6bl\151\156ks\x5fd\x69al\x6f\147_\x68e\x69\147\150t" => 400, "\x71uic\x6b\x6ci\156\x6bs\x5f\x64\151\x61\x6c\157\147\137\x74h\x75\155\x62_s\x69\x7a\145" => 200, "\144\145\146a\165l\x74_\143ach\145\137\x66\x72\145qu\145n\x63\171"=> 30, "\143li\145\156\164s\x5f\155a\x79\137r\145\x66r\145\163\x68_ca\x63\150e"=> "\x79\x65s","activ\151t\171_\143\x68\141r\164\137\x64\141\164\145\137ran\x67\x65" => "\x6cas\164_\x33\x30\x5f\x64\x61\171s", "\x61\x63t\151\x76\151\164y\x5f\x63ha\162\164_\163u\x62\155\x69\163si\157\156\x5fc\x6f\165n\x74\137\147ro\165p" => "\x64\x61\x79", "\x61\x63\164\151\166\x69\164y\137\143\x68\x61\162t_\144\145\146\x61\165\x6c\x74\137c\x68ar\x74\x5f\x74y\160e" => "l\x69\x6ee\137c\x68\x61\162t", "a\143\164\151\x76\151\164\x79\137\143\150a\x72t\x5f\143\157lo\165r" => "\x62\154u\145", "\x61\x63\164\x69v\151ty\x5f\143h\x61\x72t\137l\151\x6e\145\x5f\x77idt\150" => 2,"\146\x69\x65\x6c\144_\143h\141\x72\x74\137\144\145\146\x61\165\154t\x5fch\141r\x74\137ty\x70\x65"=> "pi\x65\x5f\x63\150\x61\162t", "fi\145\x6c\144_\x63\x68\141rt_\x69\156cl\165\x64\x65_\154eg\145\x6e\144\x5fqu\151ck\x6c\151\x6ek\x73" => "\156\x6f", "\146\151\x65\x6c\144\x5fc\x68\141\162\x74\x5f\143\x6f\x6cou\162"=> "b\154\x75e", "f\151\145ld\137\143\x68\x61\162\164\x5f\x69n\x63lu\144e_\154\145\147\145\156\x64\x5ff\x75\x6c\154_\163iz\x65"=> "\171\145\x73", "f\x69\145l\x64\x5f\143\150\x61\x72\164\x5f\160\x69\x65\137\x63\x68\141\162\164_\146\x6f\162\155\x61\x74"=> "\x32D", "\146\x69e\154\x64_c\x68\x61\x72\x74_\x69\x67\156\x6fr\145_\x65m\160\164\171\137\146i\x65\x6cd\x73" => "\171\145s" ); ft_set_settings($settings, "\144at\x61_\x76\x69\163\165a\154\151z\x61\164\151\x6f\156");}return array($success, $message);}function data_visualization__uninstall($module_id){global $g_table_prefix;$table1 = $g_table_prefix . "\155\157\x64\165\x6ce_d\x61\164\x61\137v\x69\163\165\x61liz\x61t\x69o\156s";mysql_query("\104\122\x4f\x50\x20T\x41\x42L\105 $table1");$table2 = $g_table_prefix . "\x6d\157d\x75l\145\x5fda\164a\137\x76\x69s\x75al\151z\x61t\x69on_c\141\143h\x65";mysql_query("\104RO\120\x20\124\x41B\114\105\040$table2");$table3 = $g_table_prefix . "\x6do\x64u\x6ce\x5f\x64\x61\164\x61\x5f\166\151s\x75al\151z\x61ti\157n_\x63l\x69e\156\164\x73";mysql_query("DR\117\120\x20\124A\102L\x45 $table3");return array(true, "");}

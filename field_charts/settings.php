@@ -37,11 +37,17 @@ $page_vars = array();
 $page_vars["module_settings"] = $module_settings;
 $page_vars["head_string"] =<<< END
   <script src="https://www.google.com/jsapi"></script>
+  <link type="text/css" rel="stylesheet" href="../global/css/styles.css">
 END;
 $page_vars["head_js"] =<<< END
-google.load("visualization", "1", {packages:["corechart"]});
+if (typeof google != "undefined") {
+  google.load("visualization", "1", {packages:["corechart"]});
+}
 
 $(function() {
+  if (typeof google == "undefined") {
+    $("#no_internet_connection").show();
+  }
   draw_graph();
 
   $("input[name=pie_chart_format], input[name=field_chart_ignore_empty_fields], input[name=field_chart_pie_chart_format], input[name=field_chart_include_legend_quicklinks], input[name=field_chart_include_legend_full_size], #field_chart_colour").bind("change keyup", function() {
@@ -61,6 +67,9 @@ $(function() {
 
 
   function draw_graph() {
+    if (typeof google == "undefined") {
+      return;
+    }
     var chart_type          = $("input[name=field_chart_default_chart_type]:checked").val();
     var ignore_empty_fields = $("input[name=field_chart_ignore_empty_fields]:checked").val();
 

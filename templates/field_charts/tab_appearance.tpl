@@ -8,6 +8,8 @@
     <input type="hidden" name="vis_name" id="vis_name" value="{$vis_info.vis_name|escape}" />
     <input type="hidden" name="tab" value="appearance" />
 
+    {include file="../../modules/data_visualization/no_internet_connection.tpl"}
+
     <table cellspacing="0" cellpadding="0" width="100%" class="margin_bottom_large">
     <tr>
       <td valign="top">
@@ -44,6 +46,9 @@
           <td>
             <input type="hidden" name="colour_old" value="{$vis_info.colour}" />
             {colour_dropdown name_id="colour" default=$vis_info.colour}
+            <div class="hint">
+              {$L.text_bar_and_col_charts_only}
+            </div>
           </td>
         </tr>
         </table>
@@ -95,13 +100,13 @@
       </td>
       <td width="250" valign="top">
         <div class="subtitle underline margin_bottom_large">&nbsp;{$L.word_thumbnail|upper}</div>
-        <div id="thumb_chart"></div>
+        <div id="thumb_chart"><div class="loading"></div></div>
       </td>
     </tr>
     </table>
 
     <div class="subtitle underline margin_bottom_large">{$L.phrase_full_size|upper}</div>
-    <div id="full_size_chart"></div>
+    <div id="full_size_chart"><div class="loading"></div></div>
 
     <p>
       <input type="button" id="delete_visualization" value="{$L.phrase_delete_visualization}" class="burgundy right" />

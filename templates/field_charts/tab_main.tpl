@@ -1,4 +1,4 @@
-  <form action="{$same_page}" method="post">
+  <form action="{$same_page}" method="post" onsubmit="return rsv.validate(this, rules)">
     <input type="hidden" name="vis_id" value="{$vis_info.vis_id}" />
     <input type="hidden" name="tab" value="main" />
 

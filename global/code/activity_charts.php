@@ -64,7 +64,6 @@ function dv_update_activity_chart($vis_id, $tab, $info)
     case "main":
       $vis_name   = $info["vis_name"];
       $form_id    = $info["form_id"];
-//      $view_id    = (isset($info["view_id"]) && !empty($info["view_id"])) ? $info["view_id"] : "NULL";
       $cache_update_frequency = $info["cache_update_frequency"];
 
       $query = mysql_query("
@@ -121,7 +120,6 @@ function dv_update_activity_chart($vis_id, $tab, $info)
                access_views = '$access_views'
         WHERE  vis_id = $vis_id
       ") or die(mysql_error());
-
     	break;
   }
 
@@ -164,7 +162,7 @@ function dv_get_cached_activity_info($vis_id, $cache_update_frequency, $form_id,
     SELECT *
     FROM   {$g_table_prefix}module_data_visualization_cache
     WHERE  vis_id = $vis_id AND
-           last_cached >= DATE_SUB(NOW(), INTERVAL $cache_update_frequency HOUR)
+           last_cached >= DATE_SUB(NOW(), INTERVAL $cache_update_frequency MINUTE)
     LIMIT 1
   ");
 
@@ -278,7 +276,8 @@ function dv_get_activity_info($form_id, $view_id, $date_range, $submission_count
     );
   }
 
-  list($select_clause, $stats) = _dv_get_activity_account_select_query_info($submission_count_group, $date_range_clause, $form_id, $view_id, $filter_sql_clauses);
+  list($select_clause, $stats) = _dv_get_activity_account_select_query_info($submission_count_group, $date_range,
+    $date_range_clause, $form_id, $view_id, $filter_sql_clauses);
 
   $query = mysql_query("
     SELECT $select_clause, count(*) as total
@@ -332,7 +331,8 @@ function dv_get_activity_info($form_id, $view_id, $date_range, $submission_count
  * @param integer $view_id
  * @param array
  */
-function _dv_get_activity_account_select_query_info($submission_count_group, $date_range_clause, $form_id, $view_id, $filter_sql_clauses)
+function _dv_get_activity_account_select_query_info($submission_count_group, $date_range,
+  $date_range_clause, $form_id, $view_id, $filter_sql_clauses)
 {
   global $g_table_prefix;
 
@@ -347,6 +347,7 @@ function _dv_get_activity_account_select_query_info($submission_count_group, $da
   else if ($submission_count_group == "month")
     $select_clause = "CONCAT(YEAR(submission_date), '/', MONTH(submission_date)) as period";
 
+  $day_in_secs = 60 * 60 * 24;
 
   // now figure out what days / months we actually need to return data for
   $stats  = array();
@@ -354,9 +355,8 @@ function _dv_get_activity_account_select_query_info($submission_count_group, $da
   {
     // if no date range clause was specified, the user wants to return everything. In which case, the start date
     // is dependant on what's stored in the database. [The end date is ALWAYS today - regardless of how messed up the
-    // submission data info is]
+    // submission data info actually is]
     $first_day = "";
-    $last_day  = date("Y-m-d");
     if (empty($date_range_clause))
     {
     	$where_clause = "";
@@ -370,40 +370,55 @@ function _dv_get_activity_account_select_query_info($submission_count_group, $da
         ORDER BY submission_date ASC
         LIMIT 1
       ");
+
       $first_day_result = mysql_fetch_assoc($first_day_query);
-      $first_day = ft_convert_datetime_to_timestamp($first_day_result["d"] . " 00:00:00");
+      $first_day = $first_day_result["d"];
     }
     else
     {
-    	$clause = "";
-    	if (!empty($filter_sql_clause))
-    	  $clause = "AND $filter_sql_clause";
-
-      $first_day_query = mysql_query("
-        SELECT DATE(submission_date) as d
-        FROM   {$g_table_prefix}form_{$form_id}
-        WHERE  $date_range_clause
-               $clause
-        ORDER BY submission_date ASC
-        LIMIT 1
-      ");
-
-      $first_day_result = mysql_fetch_assoc($first_day_query);
-      $first_day = ft_convert_datetime_to_timestamp($first_day_result["d"] . " 00:00:00");
+		  switch ($date_range)
+		  {
+		    case "year_to_date":
+		      $first_day = date("Y") . "-01-01";
+		      break;
+		    case "month_to_date":
+		      $first_day = date("Y-m") . "-01";
+		    	break;
+		    default:
+		      $map = array(
+		        "last_7_days"    => 7,
+		        "last_10_days"   => 10,
+		        "last_14_days"   => 14,
+		        "last_21_days"   => 21,
+		        "last_30_days"   => 30,
+		        "last_2_months"  => 60,
+		        "last_3_months"  => 90,
+		        "last_4_months"  => 120,
+		        "last_5_months"  => 151,
+		        "last_6_months"  => 182,
+		        "last_12_months" => 365,
+		        "last_2_years"   => 730,
+		        "last_3_years"   => 1095,
+		        "last_4_years"   => 1460,
+		        "last_5_years"   => 1825
+		      );
+		      $first_day = date("Y-m-d", date("U") - ($map[$date_range] * $day_in_secs));
+		      break;
+		  }
     }
 
     // each result is a DAY. Make a list of all possible days; we'll overlay the actual counts after
     // we get the results of the DB query. This ensures there are no gaps [be better to do this client-side...!]
-    $day_in_secs = 60 * 60 * 24;
-    $current_day = $first_day;
-    while ($current_day <= $last_day)
+    $current_day_unix_time = ft_convert_datetime_to_timestamp($first_day . " 00:00:00");
+    $last_day_unix_time    = ft_convert_datetime_to_timestamp(date("Y-m-d") . " 00:00:00");
+    while ($current_day_unix_time <= $last_day_unix_time)
     {
-      $date = date("Y-m-d", $current_day);
+      $date = date("Y-m-d", $current_day_unix_time);
       $stats[$date] = array(
         "label" => date("M jS", ft_convert_datetime_to_timestamp($date . " 00:00:00")),
         "data"  => 0
       );
-      $current_day += $day_in_secs;
+      $current_day_unix_time += $day_in_secs;
     }
   }
   else if ($submission_count_group == "week")
@@ -498,8 +513,8 @@ function _dv_get_activity_account_select_query_info($submission_count_group, $da
   }
   else if ($submission_count_group == "month")
   {
-      // if no date range clause was specified, the user wants to return "everything". In which case, the start and end date
-    // are dependant on whatever's stored in the database
+    // if no date range clause was specified, the user wants to return everything. In which case, the start date
+    // is therefore dependant on whatever's stored in the database
     $first_day = "";
     list($last_year, $last_month, $last_day) = explode("-", date("Y-m-d"));
     if (empty($date_range_clause))
@@ -520,20 +535,36 @@ function _dv_get_activity_account_select_query_info($submission_count_group, $da
     }
     else
     {
-      $clause = "";
-      if (!empty($filter_sql_clause))
-        $clause = "AND $filter_sql_clause";
-
-      $first_month_query = mysql_query("
-        SELECT DATE(submission_date) as d
-        FROM   {$g_table_prefix}form_{$form_id}
-        WHERE  $date_range_clause
-               $clause
-        ORDER BY submission_date ASC
-        LIMIT 1
-      ");
-      $first_month_result = mysql_fetch_assoc($first_month_query);
-      list($start_year, $start_month, $start_day) = explode("-", $first_month_result["d"]);
+ 		  switch ($date_range)
+		  {
+		    case "year_to_date":
+		      $first_day = date("Y") . "-01-01";
+		      break;
+		    case "month_to_date":
+		      $first_day = date("Y-m") . "-01";
+		    	break;
+		    default:
+		      $map = array(
+		        "last_7_days"    => 7,
+		        "last_10_days"   => 10,
+		        "last_14_days"   => 14,
+		        "last_21_days"   => 21,
+		        "last_30_days"   => 30,
+		        "last_2_months"  => 60,
+		        "last_3_months"  => 90,
+		        "last_4_months"  => 120,
+		        "last_5_months"  => 151,
+		        "last_6_months"  => 182,
+		        "last_12_months" => 365,
+		        "last_2_years"   => 730,
+		        "last_3_years"   => 1095,
+		        "last_4_years"   => 1460,
+		        "last_5_years"   => 1825
+		      );
+		      $first_day = date("Y-m-d", date("U") - ($map[$date_range] * $day_in_secs));
+		      list($start_year, $start_month, $start_day) = explode("-", $first_day);
+		      break;
+		  }
     }
 
     // each result is a MONTH. Make a list of all possible months; we'll overlay the actual counts after
@@ -558,83 +589,4 @@ function _dv_get_activity_account_select_query_info($submission_count_group, $da
   }
 
   return array($select_clause, $stats);
-}
-
-
-function dv_create_page_and_menu_item($request)
-{
-	global $g_table_prefix;
-
-  $vis_id        = $request["vis_id"];
-  $page_title    = $request["page_title"];
-  $menu_id       = $request["menu_id"];
-  $menu_position = $request["menu_position"];
-  $is_submenu    = $request["is_submenu"];
-
-  ft_include_module("pages");
-  $content = "<div style=\"border:1px solid #cccccc\">{template_hook location=\"data_visualization\" vis_id=$vis_id height=400 width=738}</div>";
-
-  // convert the info to a Pages-module-friendly format
-  $info = array(
-    "page_name"    => $page_title,
-    "heading"      => $page_title,
-    "access_type"  => "public",
-    "content_type" => "smarty",
-    "codemirror_content" => $content,
-    "use_wysiwyg_hidden" => "no"
-  );
-  list($success, $message, $page_id) = pg_add_page($info);
-
-
-  // TODO error checking here
-
-  $menu_info = ft_get_menu($menu_id);
-  $menu_type = $menu_info["menu_type"];
-
-  // now add the new Page to the menu. If it's being added to the administrator's menu, update the cached menu
-  if ($menu_position == "at_start")
-  {
-  	mysql_query("
-  	  UPDATE {$g_table_prefix}menu_items
-  	  SET    list_order = list_order+1
-  	  WHERE  menu_id = $menu_id
-  	");
-
-  	$list_order = 1;
-  }
-  else if ($menu_position == "at_end")
-  {
-    $list_order = count($menu_info["menu_items"]) + 1;
-  }
-  else
-  {
-    mysql_query("
-      UPDATE {$g_table_prefix}menu_items
-      SET    list_order = list_order+1
-      WHERE  menu_id = $menu_id AND
-             list_order > $menu_position
-    ");
-    $list_order = $menu_position+1;
-  }
-
-  $display_text = ft_sanitize($page_title);
-  mysql_query("
-    INSERT INTO {$g_table_prefix}menu_items (menu_id, display_text, page_identifier, url, is_submenu, is_new_sort_group, list_order)
-    VALUES ($menu_id, '$display_text', 'page_{$page_id}', '/modules/pages/page.php?id=$page_id', '$is_submenu', 'yes', $list_order)
-  ");
-
-  if ($menu_type == "admin")
-  {
-  	// urgh!
-  	$account_id = isset($_SESSION["ft"]["account"]["account_id"]) ? $_SESSION["ft"]["account"]["account_id"] : "";
-    ft_cache_account_menu($account_id);
-  }
-
-  $return_info = array(
-    "success"   => 1,
-    "menu_type" => $menu_type,
-    "page_id"   => $page_id
-  );
-
-  return $return_info;
 }

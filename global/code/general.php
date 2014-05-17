@@ -171,17 +171,23 @@ function dv_include_in_head($location, $params)
   }
 
   $context = "";
+  $cache_display = "block";
   if ($params["page"] == "admin_forms")
   {
   	$context = "admin_submission_listing";
   }
   else
   {
+    if ($module_settings["clients_may_refresh_cache"] == "no")
+    {
+    	$cache_display = "none";
+    }
     $context = "client_submission_listing";
   }
 
-
   $L = ft_get_module_lang_file_contents("data_visualization");
+  $vis_messages = dv_get_vis_messages($L);
+
 
   echo <<< END
 <link type="text/css" rel="stylesheet" href="$g_root_url/modules/data_visualization/global/css/visualizations.css">
@@ -199,18 +205,16 @@ $(function() {
 g.quicklinks_dialog_width = {$module_settings["quicklinks_dialog_width"]};
 g.quicklinks_dialog_height = {$module_settings["quicklinks_dialog_height"]};
 g.vis_tile_size = {$module_settings["quicklinks_dialog_thumb_size"]};
-g.vis_messages = {};
-g.vis_messages.word_visualizations = "{$L["word_visualizations"]}";
-g.vis_messages.word_close = "{$LANG["word_close"]}";
-g.vis_messages.phrase_manage_visualizations = "{$L["phrase_manage_visualizations"]}";
-g.vis_messages.word_visualizations = "{$L["word_visualizations"]}";
-g.vis_messages.phrase_edit_visualization = "{$L["phrase_edit_visualization"]}";
 
+$vis_messages
 </script>
 <style type="text/css">
 #dv_vis_tiles li {
   width: {$module_settings["quicklinks_dialog_thumb_size"]}px;
   height: {$module_settings["quicklinks_dialog_thumb_size"]}px;
+}
+#dv_vis_refresh_cache {
+  display: $cache_display;
 }
 </style>
 
@@ -249,3 +253,34 @@ function dv_delete_form_hook($info)
   }
 }
 
+
+/**
+ * Helper function used wherever the quicklinks dialog is being used. It outputs all required language strings in a
+ * g.vis_messages namespace. The assumption is that it's being output in a <script> block and the g object has been
+ * defined.
+ *
+ * @param array $L the contents of the Data Visualization language file. This is passed as a param because it's not
+ *     defined as a global outside of the module.
+ */
+function dv_get_vis_messages($L)
+{
+	global $LANG;
+
+  $js =<<< END
+
+g.vis_messages = {};
+g.vis_messages.word_visualizations = "{$L["word_visualizations"]}";
+g.vis_messages.word_close = "{$LANG["word_close"]}";
+g.vis_messages.phrase_manage_visualizations = "{$L["phrase_manage_visualizations"]}";
+g.vis_messages.word_visualizations = "{$L["word_visualizations"]}";
+g.vis_messages.phrase_edit_visualization = "{$L["phrase_edit_visualization"]}";
+g.vis_messages.phrase_prev_arrow = "{$L["phrase_prev_arrow"]}";
+g.vis_messages.phrase_next_arrow = "{$L["phrase_next_arrow"]}";
+g.vis_messages.phrase_back_to_vis_list = "{$L["phrase_back_to_vis_list"]}";
+g.vis_messages.phrase_last_cached_c = "{$L["phrase_last_cached_c"]}";
+g.vis_messages.phrase_not_cached = "{$L["phrase_not_cached"]}";
+
+END;
+
+  return $js;
+}

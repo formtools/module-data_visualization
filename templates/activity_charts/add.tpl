@@ -20,9 +20,9 @@
     <div><b>{$L.word_actions}</b></h4>
     <ul>
       <li><a href="../">{$L.phrase_list_visualizations}</a></li>
-      <li><a href="add.php">Create a new Activity Chart</a></li>
+      <li><a href="add.php">{$L.phrase_create_a_new_activity_chart}</a></li>
       {if $g_success}
-        <li><a href="edit.php?page=main&vis_id={$vis_id}">Edit the Activity Chart</a></li>
+        <li><a href="edit.php?page=main&vis_id={$vis_id}">{$L.phrase_edit_the_activity_chart}</a></li>
       {/if}
       {if $form_id && $view_id}
         <li><a href="../../../admin/forms/submissions.php?form_id={$form_id}&view_id={$view_id}">{$L.phrase_view_form_submissions}</a></li>
@@ -33,11 +33,13 @@
 
     {include file="messages.tpl"}
 
+    {include file="../../modules/data_visualization/no_internet_connection.tpl"}
+
     <div class="margin_bottom_large">
       {$L.text_add_visualization}
     </div>
 
-	  <form action="{$same_page}" method="post">
+	  <form action="{$same_page}" method="post" onsubmit="return rsv.validate(this, rules)">
 
 	    <div class="subtitle underline margin_bottom_large">{$LANG.phrase_main_settings|upper}</div>
 

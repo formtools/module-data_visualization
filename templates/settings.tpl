@@ -67,6 +67,7 @@
 
     <p>
       <input type="submit" name="update" value="{$LANG.word_update}" />
+      <input type="submit" name="clear_cache" value="{$L.phrase_clear_visualization_cache}" />
     </p>
 
   </form>

@@ -13,6 +13,8 @@
 
   {include file='messages.tpl'}
 
+  {include file="../../modules/data_visualization/no_internet_connection.tpl"}
+
   {if $total_results == 0}
 
     <div class="notify" class="margin_bottom_large">
@@ -103,15 +105,15 @@
 
     {if $results|@count == 0}
 
-	    <div class="notify" class="margin_bottom_large">
-	      <div style="padding:8px">
-	        {$L.text_no_visualization_found_in_search}
-	      </div>
-	    </div>
+      <div class="notify" class="margin_bottom_large">
+        <div style="padding:8px">
+          {$L.text_no_visualization_found_in_search}
+        </div>
+      </div>
 
     {else}
 
-	    {$pagination}
+      {$pagination}
 
       {assign var="table_group_id" value="1"}
 
@@ -131,80 +133,80 @@
 
           <div id="page_{$table_group_id}" style="{$style}">
 
-				    <table class="list_table" style="width:100%" cellpadding="1" cellspacing="1">
-				    <tr style="height: 20px;">
-				      <th>{$L.phrase_visualization_name}</th>
-				      <th>{$LANG.word_form}</th>
-			        <th>{$L.word_permissions}</th>
-			        <th>{$L.phrase_visualization_type}</th>
-				      <th>{$L.word_chart}</th>
-				      <th class="edit"></th>
-				      <th class="del"></th>
-				    </tr>
+            <table class="list_table" style="width:100%" cellpadding="1" cellspacing="1">
+            <tr style="height: 20px;">
+              <th>{$L.phrase_visualization_name}</th>
+              <th>{$LANG.word_form}</th>
+              <th>{$LANG.word_permissions}</th>
+              <th>{$L.phrase_visualization_type}</th>
+              <th>{$L.phrase_chart_type}</th>
+              <th class="edit"></th>
+              <th class="del"></th>
+            </tr>
 
         {/if}
 
-				      <tr>
-				        <td class="pad_left_small">{$result.vis_name}</td>
-				        <td class="pad_left_small">
-				          {if $result.view_id}
-				            <a href="../../admin/forms/submissions.php?form_id={$result.form_id}&view_id={$result.view_id}">{display_form_name form_id=$result.form_id}</a>
-				          {else}
-				            <a href="../../admin/forms/submissions.php?form_id={$result.form_id}">{display_form_name form_id=$result.form_id}</a>
-				          {/if}
-				        </td>
-				        <td class="pad_left_small">
-			            {if $result.access_type == "admin"}
-			              <span class="medium_grey">{$L.phrase_admin_only}</span>
-			            {elseif $result.access_type == "public"}
-			              <span>{$LANG.word_public}</span>
-			            {else}
-			              <span>{$LANG.word_private}</span>
-			            {/if}
-				        </td>
-			          <td class="pad_left_small">
-			            {if $result.vis_type == "activity"}
-			              <span class="blue">{$L.phrase_activity_charts}</span>
-			            {else}
-			              <span class="purple">{$L.phrase_field_chart}</span>
-			            {/if}
-			          </td>
-				        <td class="pad_left_small">
-				          {if $result.chart_type == "area_chart"}
-				            {$L.word_area}
-				          {elseif $result.chart_type == "line_chart"}
-				            {$L.word_line}
-			            {elseif $result.chart_type == "column_chart"}
-			              {$L.word_column}
-			            {elseif $result.chart_type == "bar_chart"}
-			              {$L.word_bar}
-			            {elseif $result.chart_type == "pie_chart"}
-			              {$L.word_pie}
-				          {/if}
-				        </td>
-				        <td class="edit">
-				          {if $result.vis_type == "activity"}
-				            <a href="activity_charts/edit.php?vis_id={$result.vis_id}"></a>
-				          {elseif $result.vis_type == "field"}
-				            <a href="field_charts/edit.php?vis_id={$result.vis_id}"></a>
-				          {/if}
-				        </td>
-				        <td class="del"><a href="#" onclick="return vis_ns.delete_visualization({$result.vis_id})"></a></td>
-				      </tr>
+              <tr>
+                <td class="pad_left_small">{$result.vis_name}</td>
+                <td class="pad_left_small">
+                  {if $result.view_id}
+                    <a href="../../admin/forms/submissions.php?form_id={$result.form_id}&view_id={$result.view_id}">{display_form_name form_id=$result.form_id}</a>
+                  {else}
+                    <a href="../../admin/forms/submissions.php?form_id={$result.form_id}">{display_form_name form_id=$result.form_id}</a>
+                  {/if}
+                </td>
+                <td class="pad_left_small">
+                  {if $result.access_type == "admin"}
+                    <span class="medium_grey">{$L.phrase_admin_only}</span>
+                  {elseif $result.access_type == "public"}
+                    <span>{$LANG.word_public}</span>
+                  {else}
+                    <span>{$LANG.word_private}</span>
+                  {/if}
+                </td>
+                <td class="pad_left_small">
+                  {if $result.vis_type == "activity"}
+                    <span class="blue">{$L.phrase_activity_charts}</span>
+                  {else}
+                    <span class="purple">{$L.phrase_field_chart}</span>
+                  {/if}
+                </td>
+                <td class="pad_left_small">
+                  {if $result.chart_type == "area_chart"}
+                    {$L.word_area}
+                  {elseif $result.chart_type == "line_chart"}
+                    {$L.word_line}
+                  {elseif $result.chart_type == "column_chart"}
+                    {$L.word_column}
+                  {elseif $result.chart_type == "bar_chart"}
+                    {$L.word_bar}
+                  {elseif $result.chart_type == "pie_chart"}
+                    {$L.word_pie}
+                  {/if}
+                </td>
+                <td class="edit">
+                  {if $result.vis_type == "activity"}
+                    <a href="activity_charts/edit.php?vis_id={$result.vis_id}"></a>
+                  {elseif $result.vis_type == "field"}
+                    <a href="field_charts/edit.php?vis_id={$result.vis_id}"></a>
+                  {/if}
+                </td>
+                <td class="del"><a href="#" onclick="return vis_ns.delete_visualization({$result.vis_id})"></a></td>
+              </tr>
 
-	        {if $count != 1 && ($count % $num_visualizations_per_page) == 0}
-	          </table></div>
-	          {assign var='table_group_id' value=$table_group_id+1}
-	        {/if}
+          {if $count != 1 && ($count % $num_visualizations_per_page) == 0}
+            </table></div>
+            {assign var='table_group_id' value=$table_group_id+1}
+          {/if}
 
-	      {/foreach}
+        {/foreach}
 
-	      {* if the table wasn't closed, close it! *}
-	      {if ($results|@count % $num_visualizations_per_page) != 0}
-	        </table></div>
-	      {/if}
+        {* if the table wasn't closed, close it! *}
+        {if ($results|@count % $num_visualizations_per_page) != 0}
+          </table></div>
+        {/if}
 
-	    {/if}
+      {/if}
     {/if}
 
     <p>

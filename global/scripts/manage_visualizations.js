@@ -3,6 +3,7 @@
  */
 var vis_ns = {
   form_fields: {},
+  view_fields: {},
   cached_activity_chart_data: null,
   cached_field_chart_data: null,
   default_view_label: null,
@@ -40,6 +41,22 @@ vis_ns.select_form = function(form_id, load_form_fields) {
 
 
 /**
+ * Called when the user selects a View.
+ */
+vis_ns.select_view = function(view_id) {
+  if (view_id == "") {
+    $("#field_id")[0].options.length = 0;
+    $("#field_id")[0].options[0] = new Option(g.messages["phrase_please_select_view"], "");
+    $("#field_id").attr("disabled", "disabled");
+    return false;
+  } else {
+    vis_ns.get_view_fields(view_id);
+  }
+  return false;
+}
+
+
+/**
  * Populates a dropdown element with a list of Views including a "Please Select" default
  * option.
  */
@@ -66,7 +83,7 @@ vis_ns.populate_view_dropdown = function(element_id, form_id) {
 
 
 /**
- * This Ajax function queries the database for a list of form field.
+ * This Ajax function queries the database for a list of form fields.
  */
 vis_ns.get_form_fields = function(form_id) {
   if (form_id == "") {
@@ -85,8 +102,8 @@ vis_ns.get_form_fields = function(form_id) {
     $.ajax({
       url:      g.root_url + "/modules/data_visualization/global/code/actions.php",
       data: {
-      action: "get_form_fields",
-      form_id: form_id
+        action: "get_form_fields",
+        form_id: form_id
       },
       type:     "GET",
       dataType: "json",
@@ -98,8 +115,40 @@ vis_ns.get_form_fields = function(form_id) {
 
 
 /**
- * This function is passed the result of the database query for the View fields. It populates vis_ns.view_fields
- * with the View field info.
+ * This Ajax function queries the database for a list of form fields in a View.
+ */
+vis_ns.get_view_fields = function(view_id) {
+  if (view_id == "") {
+    return false;
+  }
+  if (typeof vis_ns.view_fields["view_" + view_id] != 'undefined') {
+    var view_info = vis_ns.form_fields["view_" + view_id];
+    if (!view_info.is_loaded) {
+      return;
+    }
+    vis_ns.populate_view_field_dropdown(view_id);
+  } else {
+    // make a note of the fact that we're loading the fields for this form
+    vis_ns.view_fields["view_" + view_id] = { is_loaded: false };
+
+    $.ajax({
+      url: g.root_url + "/modules/data_visualization/global/code/actions.php",
+      data: {
+        action:  "get_view_fields",
+        view_id: view_id
+      },
+      type:     "GET",
+      dataType: "json",
+      success:  vis_ns.process_json_view_field_data,
+      error:    ft.error_handler
+    });
+  }
+}
+
+
+/**
+ * This function is passed the result of the database query for the form fields. It populates vis_ns.form_fields
+ * with the field info.
  */
 vis_ns.process_json_field_data = function(data) {
   var form_id = data.form_id;
@@ -119,9 +168,44 @@ vis_ns.process_json_field_data = function(data) {
 }
 
 
+/**
+ * This function is passed the result of the database query for the form fields. It populates vis_ns.form_fields
+ * with the field info.
+ */
+vis_ns.process_json_view_field_data = function(data) {
+  var view_id = data.view_id;
+
+  var view_info = vis_ns.view_fields["view_" + view_id];
+  view_info.fields = data.fields;
+  view_info.is_loaded = true;
+  vis_ns.view_fields["view_" + view_id] = view_info;
+
+  // now, if the form is still selected, update the field list
+  var selected_view_id = $("#view_id").val();
+  $("#loading_icon").hide();
+
+  if (selected_view_id == view_id) {
+    vis_ns.populate_view_field_dropdown(view_id);
+  }
+}
+
 vis_ns.populate_field_dropdowns = function(form_id) {
   var form_info = vis_ns.form_fields["form_" + form_id];
   var fields = form_info.fields;
+
+  var options = "<option value=\"\">" + g.messages["phrase_please_select"] + "</option>";
+  for (var i=0; i<fields.length; i++) {
+    var field_id    = fields[i][0];
+    var field_title = fields[i][1];
+    options += "<option value=\"" + field_id + "\">" + field_title + "</option>";
+  }
+  $("#field_id").html(options).removeAttr("disabled");
+}
+
+
+vis_ns.populate_view_field_dropdown = function(view_id) {
+  var view_info = vis_ns.view_fields["view_" + view_id];
+  var fields = view_info.fields;
 
   var options = "<option value=\"\">" + g.messages["phrase_please_select"] + "</option>";
   for (var i=0; i<fields.length; i++) {
@@ -175,6 +259,9 @@ vis_ns.update_activity_chart_data = function() {
  * currently already available in the page.
  */
 vis_ns.redraw_activity_chart = function() {
+  if (typeof google == "undefined") {
+    return;
+  }
   var title      = $("#vis_name").val();
   var colour     = $("#colour").val();
   var chart_type = $("input[name=chart_type]:checked").val();
@@ -302,11 +389,14 @@ vis_ns.update_field_chart_data = function() {
 
 
 vis_ns.redraw_field_chart = function() {
+  if (typeof google == "undefined") {
+    return;
+  }
   var title          = $("#vis_name").val();
   var chart_type     = $("input[name=chart_type]:checked").val();
 
   var data = new google.visualization.DataTable();
-  data.addColumn('string', "TODO");
+  data.addColumn('string', "");
   data.addColumn('number', 'Submission Count');
 
   if (vis_ns.cached_field_chart_data == null) {
@@ -314,12 +404,12 @@ vis_ns.redraw_field_chart = function() {
   } else {
     json = vis_ns.cached_field_chart_data;
     var data = new google.visualization.DataTable();
-    data.addColumn('string', json.period);
-    data.addColumn('number', 'Count');
+    data.addColumn("string", "");
+    data.addColumn("number", "Count");
     if (json.data.length) {
       data.addRows(json.data.length);
       for (var i=0, j=json.data.length; i<j; i++) {
-        data.setValue(i, 0, json.data[i].label);
+        data.setValue(i, 0, json.data[i].label.toString());
         data.setValue(i, 1, json.data[i].data);
       }
     }
@@ -405,7 +495,7 @@ vis_ns.delete_visualization = function(vis_id) {
 
 vis_ns.init_create_page_and_menu_item_dialog = function() {
   $("#add_to_menu").bind("click", function() {
-	var vis_id = $("#vis_id").val();
+  var vis_id = $("#vis_id").val();
     ft.create_dialog({
       dialog: $("#add_to_menu_dialog"),
       title:  "Create Page and Add to Menu",
@@ -434,7 +524,7 @@ vis_ns.init_create_page_and_menu_item_dialog = function() {
                     window.location = "edit.php?page=advanced&vis_id=" + vis_id + "&msg=page_created";
                   } else {
                     ft.display_message("ft_message", 1, "The menu has been updated with the new page.");
-                    $(this).dialog("close");
+                    $("#add_to_menu_dialog").dialog("close");
                   }
                 }
               },

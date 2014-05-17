@@ -13,11 +13,14 @@ $page_vars["head_string"] =<<< END
 END;
 
 $page_vars["head_js"] =<<< END
-
-// TODO
-google.load("visualization", "1", {packages:["corechart"]});
+if (typeof google != "undefined") {
+  google.load("visualization", "1", {packages:["corechart"]});
+}
 
 $(function() {
+  if (typeof google == "undefined") {
+    $("#no_internet_connection").show();
+  }
   if ($("#has_submissions_in_view").val() == "no") {
     $("#no_data_message").show();
   }

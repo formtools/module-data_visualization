@@ -15,6 +15,9 @@ if (typeof google != "undefined") {
 }
 
 $(function() {
+  if (typeof google == "undefined") {
+    $("#no_internet_connection").show();
+  }
   if ($("input[name=chart_type]:checked").val() == "pie_chart") {
     $("#colour").attr("disabled", "disabled");
   }
