@@ -3,23 +3,23 @@
 
 function dv_add_visualization($info)
 {
-	global $g_table_prefix, $L;
+  global $g_table_prefix, $L;
 
-	$info = ft_sanitize($info);
+  $info = ft_sanitize($info);
 
-	$vis_name    = $info["vis_name"];
-	$data_source = $info["data_source"];
+  $vis_name    = $info["vis_name"];
+  $data_source = $info["data_source"];
   $form_id     = $info["form_id"];
   $view_id     = $info["view_id"];
 
   $field_ids = "";
   if ($data_source == "single_field")
   {
-  	$field_ids = $info["single_field_id"];
+    $field_ids = $info["single_field_id"];
   }
   else
   {
-  	$field_ids = implode(",", $info["field_ids"]);
+    $field_ids = implode(",", $info["field_ids"]);
   }
 
   $result = mysql_query("
@@ -29,12 +29,12 @@ function dv_add_visualization($info)
 
   if ($result)
   {
-  	$vis_id = mysql_insert_id();
-  	return array(true, $L["notify_visualization_added"], $vis_id);
+    $vis_id = mysql_insert_id();
+    return array(true, $L["notify_visualization_added"], $vis_id);
   }
   else
   {
-  	return array(true, $L["notify_visualization_not_added"]);
+    return array(true, $L["notify_visualization_not_added"]);
   }
 }
 
@@ -88,24 +88,24 @@ function dv_get_visualization_for_display($vis_id)
 
   switch ($vis_info["vis_type"])
   {
-  	case "activity":
-	    $date_range             = $vis_info["date_range"];
-	    $submission_count_group = $vis_info["submission_count_group"];
+    case "activity":
+      $date_range             = $vis_info["date_range"];
+      $submission_count_group = $vis_info["submission_count_group"];
 
-	    // this returns a hash with "period" and "data" keys
-	    $return_info = dv_get_cached_activity_info($vis_id, $cache_update_frequency, $form_id, $view_id, $date_range, $submission_count_group);
-	    $return_info["vis_type"]   = "activity";
-	    $return_info["chart_type"] = $vis_info["chart_type"];
-	    $return_info["vis_id"]     = $vis_id;
-	    $return_info["vis_name"]   = $vis_info["vis_name"];
-	    $return_info["vis_colour"] = $vis_info["colour"];
-	    $return_info["line_width"] = $vis_info["line_width"];
-  		break;
+      // this returns a hash with "period" and "data" keys
+      $return_info = dv_get_cached_activity_info($vis_id, $cache_update_frequency, $form_id, $view_id, $date_range, $submission_count_group);
+      $return_info["vis_type"]   = "activity";
+      $return_info["chart_type"] = $vis_info["chart_type"];
+      $return_info["vis_id"]     = $vis_id;
+      $return_info["vis_name"]   = $vis_info["vis_name"];
+      $return_info["vis_colour"] = $vis_info["colour"];
+      $return_info["line_width"] = $vis_info["line_width"];
+      break;
 
     case "field":
-    	$field_id = $vis_info["field_id"];
-    	$ignore_empty_fields = $vis_info["field_chart_ignore_empty_fields"];
-    	$return_info = dv_get_cached_field_info($vis_id, $cache_update_frequency, $form_id, $view_id, $field_id, $ignore_empty_fields);
+      $field_id = $vis_info["field_id"];
+      $ignore_empty_fields = $vis_info["field_chart_ignore_empty_fields"];
+      $return_info = dv_get_cached_field_info($vis_id, $cache_update_frequency, $form_id, $view_id, $field_id, $ignore_empty_fields);
       $return_info["vis_type"]   = "field";
       $return_info["chart_type"] = $vis_info["chart_type"];
       $return_info["vis_id"]     = $vis_id;
@@ -142,7 +142,7 @@ function dv_search_visualizations($search_criteria)
   $where_clauses = array();
   if (isset($search_criteria["keyword"]) && !empty($search_criteria["keyword"]))
   {
-  	$keyword = ft_sanitize($search_criteria["keyword"]);
+    $keyword = ft_sanitize($search_criteria["keyword"]);
     $where_clauses[] = "vis_name LIKE '%$keyword%'";
   }
   if (isset($search_criteria["form_id"]) && !empty($search_criteria["form_id"]))
@@ -150,16 +150,16 @@ function dv_search_visualizations($search_criteria)
 
   if (isset($search_criteria["vis_types"]) && !empty($search_criteria["vis_types"]))
   {
-  	$vis_type_clauses = array();
-  	foreach ($search_criteria["vis_types"] as $vis_type)
-  	{
-  		$vis_type_clauses[] = "vis_type = '$vis_type'";
-  	}
-  	$where_clauses[] = "(" . implode(" OR ", $vis_type_clauses) . ")";
+    $vis_type_clauses = array();
+    foreach ($search_criteria["vis_types"] as $vis_type)
+    {
+      $vis_type_clauses[] = "vis_type = '$vis_type'";
+    }
+    $where_clauses[] = "(" . implode(" OR ", $vis_type_clauses) . ")";
   }
   if (isset($search_criteria["chart_type"]) && !empty($search_criteria["chart_type"]))
   {
-  	$where_clauses[] = "chart_type = '{$search_criteria["chart_type"]}'";
+    $where_clauses[] = "chart_type = '{$search_criteria["chart_type"]}'";
   }
 
   $where_clause = (empty($where_clauses)) ? "" : "WHERE " . implode(" AND ", $where_clauses);
@@ -200,7 +200,7 @@ function dv_search_visualizations($search_criteria)
     {
       if ($row["access_type"] == "admin")
       {
-      	continue;
+        continue;
       }
       else if ($row["access_type"] == "private")
       {
@@ -224,50 +224,50 @@ function dv_search_visualizations($search_criteria)
  */
 function dv_clear_visualization_cache($vis_id = "")
 {
-	global $g_table_prefix, $L;
+  global $g_table_prefix, $L;
 
-	$message      = $L["notify_visualization_cache_cleared"];
-	$where_clause = "";
-	if (!empty($vis_id))
-	{
+  $message      = $L["notify_visualization_cache_cleared"];
+  $where_clause = "";
+  if (!empty($vis_id))
+  {
     $where_clause = "WHERE vis_id = $vis_id";
     $message = $L["notify_specific_visualization_cache_cleared"];
-	}
+  }
 
-	@mysql_query("DELETE FROM {$g_table_prefix}module_data_visualization_cache $where_clause");
+  @mysql_query("DELETE FROM {$g_table_prefix}module_data_visualization_cache $where_clause");
 
-	return array(true, $message);
+  return array(true, $message);
 }
 
 
 function dv_get_num_visualizations()
 {
-	global $g_table_prefix;
-	$result = mysql_query("
-	  SELECT count(*) as c
-	  FROM {$g_table_prefix}module_data_visualizations
-	");
+  global $g_table_prefix;
+  $result = mysql_query("
+    SELECT count(*) as c
+    FROM {$g_table_prefix}module_data_visualizations
+  ");
   $info = mysql_fetch_assoc($result);
-	return $info["c"];
+  return $info["c"];
 }
 
 function dv_display_visualization_icon($tamplate, $page_data)
 {
-	global $g_root_url, $g_table_prefix;
+  global $g_root_url, $g_table_prefix;
 
-	$form_id = $page_data["form_id"];
+  $form_id = $page_data["form_id"];
 
-	// find out if there are any visualizations to be shown for this form
-	$query = mysql_query("
-	  SELECT count(*) as c
-	  FROM   {$g_table_prefix}module_data_visualizations
-	  WHERE  form_id = $form_id AND
-	         show_on_submission_listing_page = 'yes'
+  // find out if there are any visualizations to be shown for this form
+  $query = mysql_query("
+    SELECT count(*) as c
+    FROM   {$g_table_prefix}module_data_visualizations
+    WHERE  form_id = $form_id AND
+           show_on_submission_listing_page = 'yes'
     ");
 
-	$result = mysql_fetch_assoc($query);
-	if ($result["c"] == 0)
-	  return;
+  $result = mysql_fetch_assoc($query);
+  if ($result["c"] == 0)
+    return;
 
   echo "<div style=\"float: right; margin-top: -32px;\"><a href=\"#\"><img src=\"$g_root_url/modules/data_visualization/images/icon_visualization_small.png\" /></a></div>";
 }
@@ -278,20 +278,20 @@ function dv_delete_visualization($vis_id)
   global $g_table_prefix, $L;
 
   if (empty($vis_id) || !is_numeric($vis_id))
-  	return array();
+    return array();
 
-	$query = @mysql_query("DELETE FROM {$g_table_prefix}module_data_visualizations WHERE vis_id = $vis_id");
+  $query = @mysql_query("DELETE FROM {$g_table_prefix}module_data_visualizations WHERE vis_id = $vis_id");
 
-	if (mysql_affected_rows() > 0)
-	{
+  if (mysql_affected_rows() > 0)
+  {
     @mysql_query("DELETE FROM {$g_table_prefix}module_data_visualization_clients WHERE vis_id = $vis_id");
     @mysql_query("DELETE FROM {$g_table_prefix}module_data_visualization_cache WHERE vis_id = $vis_id");
-		return array(true, $L["notify_vis_deleted"]);
-	}
-	else
-	{
-		return array(false, $L["notify_vis_not_deleted"]);
-	}
+    return array(true, $L["notify_vis_deleted"]);
+  }
+  else
+  {
+    return array(false, $L["notify_vis_not_deleted"]);
+  }
 }
 
 
@@ -323,13 +323,13 @@ function dv_get_visualization_clients($vis_id)
 
 function dv_display_in_pages_module($location, $params)
 {
-	$attributes = $params["form_tools_all_template_hook_params"];
+  $attributes = $params["form_tools_all_template_hook_params"];
 
-	if (!isset($attributes["vis_id"]) || empty($attributes["vis_id"]))
-	{
-	  echo "[Data Visualization hook error: <b>No vis_id attribute</b>]";
-	  return;
-	}
+  if (!isset($attributes["vis_id"]) || empty($attributes["vis_id"]))
+  {
+    echo "[Data Visualization hook error: <b>No vis_id attribute</b>]";
+    return;
+  }
   if (!isset($attributes["height"]) || empty($attributes["height"]))
   {
     echo "[Data Visualization hook error: <b>No height attribute</b>]";
@@ -346,16 +346,57 @@ function dv_display_in_pages_module($location, $params)
   $height = $attributes["height"];
   $width  = $attributes["width"];
 
-  dv_display_visualization($vis_id, $width, $height);
+  /*
+   Settings that may be overridden:
+
+     Activity Charts:
+     - title (vis_name)
+     - colour ("red", "orange", "yellow", "green", "blue", "indigo", "violet", "black", "gray"
+     - line_width (number 0-10)
+
+     Field Charts:
+
+     (pie chart)
+     - title (vis_name)
+     - pie_chart_format ("3D" / "2D")
+     - include_legend ("yes" / "no")
+
+     (other)
+     - title (vis_name)
+     - colour ("red", "orange", "yellow", "green", "blue", "indigo", "violet", "black", "gray"
+  */
+
+  $overridden_settings = array();
+  if (isset($attributes["title"]))
+    $overridden_settings["title"] = $attributes["title"];
+  if (isset($attributes["line_width"]))
+    $overridden_settings["line_width"] = $attributes["line_width"];
+  if (isset($attributes["pie_chart_format"]))
+    $overridden_settings["pie_chart_format"] = $attributes["pie_chart_format"];
+  if (isset($attributes["include_legend"]))
+    $overridden_settings["include_legend"] = $attributes["include_legend"];
+
+  // allow both US + Canadian/UK spelling
+  if (isset($attributes["colour"]))
+    $overridden_settings["colour"] = $attributes["colour"];
+  else if (isset($attributes["color"]))
+    $overridden_settings["colour"] = $attributes["color"];
+
+  dv_display_visualization($vis_id, $width, $height, $overridden_settings);
 }
 
 
-function dv_display_visualization($vis_id, $width, $height)
+function dv_display_visualization($vis_id, $width, $height, $overridden_settings = array())
 {
   $vis_info = dv_get_visualization_for_display($vis_id);
   $vis_type   = $vis_info["vis_type"];
   $chart_type = $vis_info["chart_type"];
-  $title      = ft_sanitize($vis_info["vis_name"]);
+
+  $title = $vis_info["vis_name"];
+  if (isset($overridden_settings["title"]))
+    $title = $overridden_settings["title"];
+
+  $title = ft_sanitize($title);
 
   $num_rows = count($vis_info["data"]);
 
@@ -370,17 +411,24 @@ function dv_display_visualization($vis_id, $width, $height)
 
   switch ($chart_type)
   {
-  	// line and area charts are specific to Activity Chart visualizations
+    // line and area charts are specific to Activity Chart visualizations
     case "area_chart":
-  	case "line_chart":
-  		$chart_class = ($chart_type == "area_chart") ? "AreaChart" : "LineChart";
+    case "line_chart":
+      $chart_class = ($chart_type == "area_chart") ? "AreaChart" : "LineChart";
+      $colour = $vis_info["vis_colour"];
+      if (isset($overridden_settings["colour"]))
+        $colour = $overridden_settings["colour"];
+      $line_width = $vis_info["line_width"];
+      if (isset($overridden_settings["line_width"]) && is_numeric($overridden_settings["line_width"]))
+        $line_width = $overridden_settings["line_width"];
+
       $js_lines[] =<<< END
 var chart = new google.visualization.$chart_class(document.getElementById("dv_vis_{$vis_id}"));
 var settings = {
   width: $width,
   height: $height,
-  colors: ["{$vis_info["vis_colour"]}"],
-  lineWidth: {$vis_info["line_width"]},
+  colors: ["$colour"],
+  lineWidth: {$line_width},
   title: '$title',
   legend: 'none'
 }
@@ -389,38 +437,59 @@ END;
 
     // Activity AND Field Charts
     case "column_chart":
-    	if ($vis_type == "activity")
-    	{
+      if ($vis_type == "activity")
+      {
+        $colour = $vis_info["vis_colour"];
+        if (isset($overridden_settings["colour"]))
+          $colour = $overridden_settings["colour"];
+	      $line_width = $vis_info["line_width"];
+	      if (isset($overridden_settings["line_width"]) && is_numeric($overridden_settings["line_width"]))
+	        $line_width = $overridden_settings["line_width"];
+
         $js_lines[] =<<< END
 var chart = new google.visualization.ColumnChart(document.getElementById("dv_vis_{$vis_id}"));
 var settings = {
   width:  $width,
   height: $height,
-  colors: ["{$vis_info["vis_colour"]}"],
-  lineWidth: {$vis_info["line_width"]},
+  colors: ["$colour"],
+  lineWidth: {$line_width},
   title: '$title',
   legend: 'none'
 }
 END;
-    	}
+      }
       break;
 
     case "bar_chart":
-        $js_lines[] =<<< END
+      $colour = $vis_info["vis_colour"];
+      if (isset($overridden_settings["colour"]))
+        $colour = $overridden_settings["colour"];
+
+      $js_lines[] =<<< END
 var chart = new google.visualization.BarChart(document.getElementById("dv_vis_{$vis_id}"));
 var settings = {
   width:  $width,
   height: $height,
-  colors: ["{$vis_info["vis_colour"]}"],
+  colors: ["$colour"],
   title: '$title',
   legend: 'none'
 }
 END;
-    	break;
+      break;
 
     case "pie_chart":
-    	$is_3D  = ($vis_info["pie_chart_format"] == "3D") ? "true" : "false";
-    	$legend = ($vis_info["include_legend_full_size"] == "yes") ? "right" : "none";
+      $pie_chart_format = $vis_info["pie_chart_format"];
+      if (isset($overridden_settings["pie_chart_format"]))
+        $pie_chart_format = $overridden_settings["pie_chart_format"];
+
+      $is_3D = ($pie_chart_format == "3D") ? "true" : "false";
+
+      $include_legend = $vis_info["include_legend_full_size"];
+      if (isset($overridden_settings["include_legend"]))
+        $include_legend = $overridden_settings["include_legend"];
+
+      $legend = ($include_legend == "yes") ? "right" : "none";
+
       $js_lines[] =<<< END
 var chart = new google.visualization.PieChart(document.getElementById("dv_vis_{$vis_id}"));
 var settings = {
@@ -431,7 +500,7 @@ var settings = {
   title: '$title'
 }
 END;
-    	break;
+      break;
   }
 
   $js_lines_str = implode("\n", $js_lines);
@@ -462,29 +531,29 @@ END;
  */
 function dv_get_tabset_links($vis_id)
 {
-	$keyword        = ft_load_module_field("data_visualization", "keyword", "dv_search_keyword", "");
-	$search_form_id = ft_load_module_field("data_visualization", "form_id", "dv_form_id", "");
-	$search_view_id = ft_load_module_field("data_visualization", "view_id", "dv_view_id", "");
-	$vis_types      = ft_load_module_field("data_visualization", "vis_types", "dv_vis_types", array("activity", "field"));
-	$chart_type     = ft_load_module_field("data_visualization", "chart_type", "dv_chart_type", "");
-	$account_type   = ft_load_module_field("data_visualization", "account_type", "dv_account_type", "admin");
-	$client_id      = ft_load_module_field("data_visualization", "client_id", "dv_client_id", "");
+  $keyword        = ft_load_module_field("data_visualization", "keyword", "dv_search_keyword", "");
+  $search_form_id = ft_load_module_field("data_visualization", "form_id", "dv_form_id", "");
+  $search_view_id = ft_load_module_field("data_visualization", "view_id", "dv_view_id", "");
+  $vis_types      = ft_load_module_field("data_visualization", "vis_types", "dv_vis_types", array("activity", "field"));
+  $chart_type     = ft_load_module_field("data_visualization", "chart_type", "dv_chart_type", "");
+  $account_type   = ft_load_module_field("data_visualization", "account_type", "dv_account_type", "admin");
+  $client_id      = ft_load_module_field("data_visualization", "client_id", "dv_client_id", "");
 
-	$search_criteria = array(
-	  "keyword"      => $keyword,
-	  "form_id"      => $search_form_id,
-	  "view_id"      => $search_view_id,
-	  "vis_types"    => $vis_types,
-	  "chart_type"   => $chart_type,
-	  "account_type" => $account_type,
-	  "client_id"    => $client_id
-	    );
+  $search_criteria = array(
+    "keyword"      => $keyword,
+    "form_id"      => $search_form_id,
+    "view_id"      => $search_view_id,
+    "vis_types"    => $vis_types,
+    "chart_type"   => $chart_type,
+    "account_type" => $account_type,
+    "client_id"    => $client_id
+      );
 
-	$results = dv_search_visualizations($search_criteria);
+  $results = dv_search_visualizations($search_criteria);
 
   $return_info = array("prev_link" => "", "next_link" => "");
-	$sorted_vis_ids = array();
-	$vis_id_to_types = array();
+  $sorted_vis_ids = array();
+  $vis_id_to_types = array();
   foreach ($results as $vis_info)
   {
     $sorted_vis_ids[] = $vis_info["vis_id"];
@@ -496,7 +565,7 @@ function dv_get_tabset_links($vis_id)
   {
     if (count($sorted_vis_ids) > 1)
     {
-    	$next_vis_id = $sorted_vis_ids[$current_index+1];
+      $next_vis_id = $sorted_vis_ids[$current_index+1];
       if ($vis_id_to_types[$next_vis_id] == "activity")
         $return_info["next_link"] = "../activity_charts/edit.php?vis_id=$next_vis_id";
       else
@@ -507,7 +576,7 @@ function dv_get_tabset_links($vis_id)
   {
     if (count($sorted_vis_ids) > 1)
     {
-    	$prev_vis_id = $sorted_vis_ids[$current_index-1];
+      $prev_vis_id = $sorted_vis_ids[$current_index-1];
       if ($vis_id_to_types[$prev_vis_id] == "activity")
         $return_info["prev_link"] = "../activity_charts/edit.php?vis_id=$prev_vis_id";
       else
@@ -519,8 +588,8 @@ function dv_get_tabset_links($vis_id)
     $prev_vis_id = $sorted_vis_ids[$current_index-1];
     if ($vis_id_to_types[$prev_vis_id] == "activity")
       $return_info["prev_link"] = "../activity_charts/edit.php?vis_id=$prev_vis_id";
-  	else
-  	  $return_info["prev_link"] = "../field_charts/edit.php?vis_id=$prev_vis_id";
+    else
+      $return_info["prev_link"] = "../field_charts/edit.php?vis_id=$prev_vis_id";
 
     $next_vis_id = $sorted_vis_ids[$current_index+1];
     if ($vis_id_to_types[$next_vis_id] == "activity")
@@ -541,7 +610,7 @@ function dv_get_tabset_links($vis_id)
  */
 function dv_create_page_and_menu_item($request)
 {
-	global $g_table_prefix;
+  global $g_table_prefix;
 
   $vis_id        = $request["vis_id"];
   $page_title    = $request["page_title"];
@@ -569,13 +638,13 @@ function dv_create_page_and_menu_item($request)
   // now add the new Page to the menu. If it's being added to the administrator's menu, update the cached menu
   if ($menu_position == "at_start")
   {
-  	mysql_query("
-  	  UPDATE {$g_table_prefix}menu_items
-  	  SET    list_order = list_order+1
-  	  WHERE  menu_id = $menu_id
-  	");
+    mysql_query("
+      UPDATE {$g_table_prefix}menu_items
+      SET    list_order = list_order+1
+      WHERE  menu_id = $menu_id
+    ");
 
-  	$list_order = 1;
+    $list_order = 1;
   }
   else if ($menu_position == "at_end")
   {
@@ -600,7 +669,7 @@ function dv_create_page_and_menu_item($request)
 
   if ($menu_type == "admin")
   {
-  	$account_id = isset($_SESSION["ft"]["account"]["account_id"]) ? $_SESSION["ft"]["account"]["account_id"] : "";
+    $account_id = isset($_SESSION["ft"]["account"]["account_id"]) ? $_SESSION["ft"]["account"]["account_id"] : "";
     ft_cache_account_menu($account_id);
   }
 
