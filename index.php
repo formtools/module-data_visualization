@@ -1,103 +1,101 @@
 <?php
 
 require_once("../../global/library.php");
-ft_init_module_page();
-$request = array_merge($_POST, $_GET);
+
+use FormTools\Core;
+use FormTools\General;
+use FormTools\Modules;
+
+$module = Modules::initModulePage("admin");
+$L = $module->getLangStrings();
+$LANG = Core::$L;
 
 $num_visualizations_per_page = 10;
-
-if (isset($_GET["delete"]))
-{
-	list($g_success, $g_message) = dv_delete_visualization($_GET["delete"]);
+$success = true;
+$message = "";
+if (isset($_GET["delete"])) {
+	list($success, $message) = dv_delete_visualization($_GET["delete"]);
 }
 
-if (isset($_GET["reset"]))
-{
-  $_GET["keyword"] = "";
-  $_GET["form_id"] = "";
-  $_GET["view_id"] = "";
-  $_GET["vis_types"] = array("activity", "field");
-  $_GET["chart_type"] = "";
-  $_GET["account_type"] = "admin";
-  $_GET["client_id"] = "";
+if (isset($_GET["reset"])) {
+    $_GET["keyword"] = "";
+    $_GET["form_id"] = "";
+    $_GET["view_id"] = "";
+    $_GET["vis_types"] = array("activity", "field");
+    $_GET["chart_type"] = "";
+    $_GET["account_type"] = "admin";
+    $_GET["client_id"] = "";
 }
 
 // if we're being linked here from the admin's Submission Listing page (i.e. the user just clicked the "Manage Visualizations" button)
 // reset everything except the form & View
-if (isset($_GET["source"]) && $_GET["source"] == "admin_submission_listing")
-{
-  $_GET["keyword"] = "";
-  $_GET["vis_types"] = array("activity", "field");
-  $_GET["chart_type"] = "";
-  $_GET["account_type"] = "admin";
-  $_GET["client_id"] = "";
+if (isset($_GET["source"]) && $_GET["source"] == "admin_submission_listing") {
+    $_GET["keyword"] = "";
+    $_GET["vis_types"] = array("activity", "field");
+    $_GET["chart_type"] = "";
+    $_GET["account_type"] = "admin";
+    $_GET["client_id"] = "";
 }
 
-$keyword        = ft_load_module_field("data_visualization", "keyword", "dv_search_keyword", "");
-$search_form_id = ft_load_module_field("data_visualization", "form_id", "dv_form_id", "");
-$search_view_id = ft_load_module_field("data_visualization", "view_id", "dv_view_id", "");
-$vis_types      = ft_load_module_field("data_visualization", "vis_types", "dv_vis_types", array("activity", "field"));
-$chart_type     = ft_load_module_field("data_visualization", "chart_type", "dv_chart_type", "");
-$account_type   = ft_load_module_field("data_visualization", "account_type", "dv_account_type", "admin");
-$client_id      = ft_load_module_field("data_visualization", "client_id", "dv_client_id", "");
+$keyword        = Modules::loadModuleField("data_visualization", "keyword", "dv_search_keyword", "");
+$search_form_id = Modules::loadModuleField("data_visualization", "form_id", "dv_form_id", "");
+$search_view_id = Modules::loadModuleField("data_visualization", "view_id", "dv_view_id", "");
+$vis_types      = Modules::loadModuleField("data_visualization", "vis_types", "dv_vis_types", array("activity", "field"));
+$chart_type     = Modules::loadModuleField("data_visualization", "chart_type", "dv_chart_type", "");
+$account_type   = Modules::loadModuleField("data_visualization", "account_type", "dv_account_type", "admin");
+$client_id      = Modules::loadModuleField("data_visualization", "client_id", "dv_client_id", "");
 
 $search_criteria = array(
-  "keyword"      => $keyword,
-  "form_id"      => $search_form_id,
-  "view_id"      => $search_view_id,
-  "vis_types"    => $vis_types,
-  "chart_type"   => $chart_type,
-  "account_type" => $account_type,
-  "client_id"    => $client_id
-    );
+    "keyword"      => $keyword,
+    "form_id"      => $search_form_id,
+    "view_id"      => $search_view_id,
+    "vis_types"    => $vis_types,
+    "chart_type"   => $chart_type,
+    "account_type" => $account_type,
+    "client_id"    => $client_id
+);
 
 $results = dv_search_visualizations($search_criteria);
 $total_results = dv_get_num_visualizations();
 $js = dv_get_form_view_mapping_js();
 
-$module_settings = ft_get_module_settings("", "data_visualization");
+$module_settings = $module->getSettings("", "data_visualization");
 
 // get the list of visualization IDs for use in the page
 $vis_ids = array();
-foreach ($results as $vis_info)
-{
+foreach ($results as $vis_info) {
 	$vis_ids[] = $vis_info["vis_id"];
 }
 $vis_id_str = implode(",", $vis_ids);
 
 $vis_messages = dv_get_vis_messages($L);
 
-// ------------------------------------------------------------------------------------------------
 
-$page_vars = array();
-$page_vars["results"] = $results;
-$page_vars["total_results"] = $total_results;
-$page_vars["num_visualizations_per_page"] = $num_visualizations_per_page;
-$page_vars["keyword"] = $keyword;
-$page_vars["search_form_id"] = $search_form_id;
-$page_vars["search_view_id"] = $search_view_id;
-$page_vars["keyword"] = $keyword;
-$page_vars["vis_types"] = $vis_types;
-$page_vars["chart_type"] = $chart_type;
-$page_vars["account_type"] = $account_type;
-$page_vars["client_id"] = $client_id;
-$page_vars["js_messages"] = array("word_delete", "word_edit", "phrase_please_select_form", "phrase_please_select", "word_yes", "word_no");
-$page_vars["module_js_messages"] = array("phrase_delete_visualization", "confirm_delete_visualization");
-$page_vars["pagination"] = ft_get_dhtml_page_nav(count($results), $num_visualizations_per_page, 1);
+$page_vars = array(
+    "results" => $results,
+    "total_results" => $total_results,
+    "num_visualizations_per_page" => $num_visualizations_per_page,
+    "keyword" => $keyword,
+    "search_form_id" => $search_form_id,
+    "search_view_id" => $search_view_id,
+    "vis_types" => $vis_types,
+    "chart_type" => $chart_type,
+    "account_type" => $account_type,
+    "client_id" => $client_id,
+    "js_messages" => array(
+        "word_delete", "word_edit", "phrase_please_select_form", "phrase_please_select", "word_yes", "word_no"
+    ),
+    "module_js_messages" => array(
+        "phrase_delete_visualization", "confirm_delete_visualization"
+    ),
+    "pagination" => General::getJsPageNav(count($results), $num_visualizations_per_page, 1)
+);
 
-$page_vars["head_string"] =<<<END
-  <script src="https://www.google.com/jsapi"></script>
-  <link type="text/css" rel="stylesheet" href="global/css/styles.css">
-  <script src="global/scripts/manage_visualizations.js"></script>
-  <script src="global/scripts/visualizations.js?v=2"></script>
-  <link type="text/css" rel="stylesheet" href="global/css/visualizations.css">
-
-<style type="text/css">
+$page_vars["head_css"] =<<<END
 #dv_vis_tiles li {
   width: {$module_settings["quicklinks_dialog_thumb_size"]}px;
   height: {$module_settings["quicklinks_dialog_thumb_size"]}px;
 }
-</style>
 END;
 
 $page_vars["head_js"] =<<< END
@@ -167,4 +165,4 @@ $js
 END;
 
 
-ft_display_module_page("templates/index.tpl", $page_vars);
+$module->displayPage("templates/index.tpl", $page_vars);
