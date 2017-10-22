@@ -7,26 +7,24 @@ use FormTools\Core;
 use FormTools\Hooks;
 use FormTools\Settings;
 use FormTools\Module as FormToolsModule;
-use PDOException;
+use PDO, PDOException;
 
 
 class Module extends FormToolsModule
 {
-    protected $moduleName = "Export Manager";
-    protected $moduleDesc = "Define your own ways of exporting form submission data for view / download. Excel, Printer-friendly HTML, XML and CSV are included by default.";
+    protected $moduleName = "Data Visualization";
+    protected $moduleDesc = "This module utilizes Google Charts API to create custom graphs and charts of your form submission data, providing an alternative, visual interpretation of your data.";
     protected $author = "Ben Keen";
     protected $authorEmail = "ben.keen@gmail.com";
     protected $authorLink = "http://formtools.org";
-    protected $version = "3.0.2";
-    protected $date = "2017-10-14";
+    protected $version = "2.0.0";
+    protected $date = "2017-10-21";
     protected $originLanguage = "en_us";
     protected $jsFiles = array(
-        "{MODULEROOT}/scripts/manage_visualizations.js",
-        "{MODULEROOT}/scripts/visualizations.js"
-
-        //<script src="https://www.google.com/jsapi"></script>
-
+        "https://www.gstatic.com/charts/loader.js",
+        "{MODULEROOT}/scripts/manage_visualizations.js"
     );
+
     protected $cssFiles = array(
         "{MODULEROOT}/css/styles.css",
         "{MODULEROOT}/css/visualizations.css"
@@ -36,7 +34,7 @@ class Module extends FormToolsModule
         "word_visualizations"    => array("index.php", false),
         "phrase_main_settings"   => array("settings.php", false),
         "phrase_activity_charts" => array("activity_charts/settings.php", true),
-        "phrase_field_charts"    => array("settings.php", true),
+        "phrase_field_charts"    => array("field_charts/settings.php", true),
         "word_help"              => array("help.php", false)
     );
 
@@ -152,4 +150,145 @@ class Module extends FormToolsModule
 
         return array(true, "");
     }
+
+    /**
+     * This adds the quicklink icon to the Submission Listing page. This function is already assigned to those
+     * particular hooks on the admin and client Submission Listing pages.
+     *
+     * It only shows the icon if there's at least ONE visualization to show for this form View.
+     *
+     * @param array $params
+     */
+    public function addQuicklink($params)
+    {
+        $root_url = Core::getRootUrl();
+        $smarty = Core::$smarty;
+        $template_vars = $smarty->getTemplateVars();
+
+        $module_settings = $this->getSettings();
+        if ($template_vars["page"] == "client_forms" && $module_settings["hide_from_client_accounts"] == "yes") {
+            return "";
+        }
+
+        $form_id = $template_vars["form_info"]["form_id"];
+        $view_id = $template_vars["view_id"];
+
+        $vis_ids = General::getQuicklinkVisualizations($form_id, $view_id);
+
+        if (empty($vis_ids)) {
+            return "";
+        }
+
+        $vis_id_str = implode(",", $vis_ids);
+
+      // output the visualization IDs right into the page. This will save an HTTP request to retrieve them later
+      echo <<< END
+    <script>g.vis_ids = [$vis_id_str];</script>
+END;
+
+        $L = $this->getLangStrings();
+        return array(
+            "quicklinks" => array(
+                "icon_url"   => "$root_url/modules/data_visualization/images/icon_visualization16x16.png",
+                "title_text" => "{$L["phrase_view_visualizations"]}",
+                "href"       => "#",
+                "onclick"    => "return dv_ns.show_visualizations_dialog()"
+            )
+        );
+    }
+
+
+    /**
+     * This embeds the necessary include files for the Visualization module into the head of the admin and client
+     * Submission Listing page. Sadly, at the point this is executed, we don't have access to the page data (namely
+     * form ID and View ID) so we can't determine whether or not we NEED to include the code.
+     *
+     * @param string $location
+     * @param array $params
+     */
+    public function includeInHead($location, $params)
+    {
+        $root_url = Core::getRootUrl();
+        $L = $this->getLangStrings();
+
+        if ($params["page"] != "admin_forms" && $params["page"] != "client_forms") {
+            return;
+        }
+
+        $module_settings = $this->getSettings();
+        if ($params["page"] == "client_forms" && $module_settings["hide_from_client_accounts"] == "yes") {
+            return;
+        }
+
+        $cache_display = "block";
+        if ($params["page"] == "admin_forms") {
+            $context = "admin_submission_listing";
+        } else {
+            if ($module_settings["clients_may_refresh_cache"] == "no") {
+                $cache_display = "none";
+            }
+            $context = "client_submission_listing";
+        }
+
+        $vis_messages = General::getVisMessages($L);
+
+        echo <<< END
+<script src="https://www.google.com/jsapi"></script>
+<link type="text/css" rel="stylesheet" href="$root_url/modules/data_visualization/css/visualizations.css">
+<script src="$root_url/modules/data_visualization/scripts/visualizations.js?v=2"></script>
+<script>
+$(function() {
+    $(".dv_vis_tile_enlarge").live("click", dv_ns.enlarge_visualization);
+    $("#dv_vis_full_nav li.back span").live("click", dv_ns.return_to_overview);
+    $("#dv_vis_full_nav li.prev span").live("click", dv_ns.show_prev_visualization);
+    $("#dv_vis_full_nav li.next span").live("click", dv_ns.show_next_visualization);
+    dv_ns.context = "$context";
+});
+
+g.quicklinks_dialog_width = {$module_settings["quicklinks_dialog_width"]};
+g.quicklinks_dialog_height = {$module_settings["quicklinks_dialog_height"]};
+g.vis_tile_size = {$module_settings["quicklinks_dialog_thumb_size"]};
+
+$vis_messages
+</script>
+
+<style>
+#dv_vis_tiles li {
+    width: {$module_settings["quicklinks_dialog_thumb_size"]}px;
+    height: {$module_settings["quicklinks_dialog_thumb_size"]}px;
+}
+#dv_vis_refresh_cache {
+    display: $cache_display;
+}
+</style>
+END;
+    }
+
+
+    public static function displayVisualizationIcon($template, $page_data)
+    {
+        $db = Core::$db;
+
+        // find out if there are any visualizations to be shown for this form
+        $db->query("
+            SELECT count(*)
+            FROM   {PREFIX}module_data_visualizations
+            WHERE  form_id = :form_id
+        ");
+        $db->bind("form_id", $page_data["form_id"]);
+        $db->execute();
+
+        if ($db->fetch(PDO::FETCH_COLUMN) == 0) {
+            return;
+        }
+
+        $root_url = Core::getRootUrl();
+
+        echo <<< END
+<div style="float: right; margin-top: -32px;">
+    <a href="#"><img src="$root_url/modules/data_visualization/images/icon_visualization_small.png" /></a>
+</div>
+END;
+    }
+
 }

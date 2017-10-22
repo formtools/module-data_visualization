@@ -4,23 +4,42 @@
 namespace FormTools\Modules\DataVisualization;
 
 use FormTools\Core;
+use FormTools\General as CoreGeneral;
 use FormTools\Modules;
-use PDOException;
+use FormTools\ViewFilters;
+use PDO, PDOException;
 
 
 class ActivityCharts
 {
+    private static $intervalMap = array(
+        "last_7_days"    => 7,
+        "last_10_days"   => 10,
+        "last_14_days"   => 14,
+        "last_21_days"   => 21,
+        "last_30_days"   => 30,
+        "last_2_months"  => 60,
+        "last_3_months"  => 90,
+        "last_4_months"  => 120,
+        "last_5_months"  => 151,
+        "last_6_months"  => 182,
+        "last_12_months" => 365,
+        "last_2_years"   => 730,
+        "last_3_years"   => 1095,
+        "last_4_years"   => 1460,
+        "last_5_years"   => 1825
+    );
+
     /**
      * Adds a new activity chart to the database.
      *
      * @param array $info everything in the POST request from the New Activity Chart page
      */
-    public function addActivityChart($info)
+    public static function addActivityChart($info, $L)
     {
         $db = Core::$db;
 
         $module_settings = Modules::getModuleSettings("", "data_visualization");
-        $L = $this->getLangStrings();
 
         $view_id = isset($info["view_id"]) ? $info["view_id"] : null;
 
@@ -61,87 +80,24 @@ class ActivityCharts
      * @param integer $vis_id
      * @param array $info
      */
-    function dv_update_activity_chart($vis_id, $tab, $info)
+    public static function updateActivityChart($vis_id, $tab, $info, $L)
     {
-        global $g_table_prefix, $L;
+        try {
+            if ($tab == "main") {
+                self::updateVisualizationMainTab($vis_id, $info);
+            } else if ($tab == "appearance") {
+                self::updateVisualizationAppearanceTab($vis_id, $info);
+            } else if ($tab == "permissions") {
+                self::updateVisualizationPermissionsTab($vis_id, $info);
+            }
 
-        $info = ft_sanitize($info);
-
-        switch ($tab)
-        {
-            case "main":
-                $vis_name   = $info["vis_name"];
-                $form_id    = $info["form_id"];
-                $cache_update_frequency = $info["cache_update_frequency"];
-
-                $query = mysql_query("
-        UPDATE {$g_table_prefix}module_data_visualizations
-        SET    vis_name = '$vis_name',
-               form_id = $form_id,
-               cache_update_frequency = '$cache_update_frequency'
-        WHERE  vis_id = $vis_id
-      ") or die(mysql_error());
-                break;
-
-            case "appearance":
-                $chart_type = $info["chart_type"];
-                $date_range = $info["date_range"];
-                $submission_count_group = $info["submission_count_group"];
-                $colour = $info["colour"];
-                $line_width = isset($info["line_width"]) ? $info["line_width"] : 2;
-
-                $query = mysql_query("
-        UPDATE {$g_table_prefix}module_data_visualizations
-        SET    chart_type = '$chart_type',
-               date_range = '$date_range',
-               submission_count_group = '$submission_count_group',
-               colour = '$colour',
-               line_width = '$line_width'
-        WHERE  vis_id = $vis_id
-      ") or die(mysql_error());
-                break;
-
-            case "permissions":
-                $selected_client_ids = (isset($info["selected_client_ids"])) ? $info["selected_client_ids"] : array();
-                mysql_query("DELETE FROM {$g_table_prefix}module_data_visualization_clients WHERE vis_id = $vis_id");
-                foreach ($selected_client_ids as $account_id)
-                {
-                    mysql_query("
-		      INSERT INTO {$g_table_prefix}module_data_visualization_clients (vis_id, account_id)
-		      VALUES ($vis_id, $account_id)
-		        ");
-                }
-
-                $access_type         = $info["access_type"];
-                $access_view_mapping = $info["access_view_mapping"];
-
-                $access_views = "";
-                if ($access_view_mapping != "all") {
-                    $view_ids = (isset($info["view_ids"])) ? $info["view_ids"] : array();
-                    $access_views = implode(",", $view_ids);
-                }
-
-                $query = mysql_query("
-        UPDATE {$g_table_prefix}module_data_visualizations
-        SET    access_type = '$access_type',
-               access_view_mapping = '$access_view_mapping',
-               access_views = '$access_views'
-        WHERE  vis_id = $vis_id
-      ") or die(mysql_error());
-                break;
-        }
-
-        // always clear the cache
-        dv_clear_visualization_cache($vis_id);
-
-        if ($query)
-        {
-            return array(true, $L["notify_activity_chart_updated"]);
-        }
-        else
-        {
+            // always clear the cache
+            Visualizations::clearVisualizationCache($vis_id);
+        } catch (PDOException $e) {
             return array(false, $L["notify_error_updating_activity_chart"], "");
         }
+
+        return array(true, $L["notify_activity_chart_updated"]);
     }
 
 
@@ -156,43 +112,42 @@ class ActivityCharts
      * @param string $date_range
      * @param string $submission_count_group
      */
-    function dv_get_cached_activity_info($vis_id, $cache_update_frequency, $form_id, $view_id, $date_range, $submission_count_group)
+    public static function getCachedActivityInfo($vis_id, $cache_update_frequency, $form_id, $view_id, $date_range, $submission_count_group)
     {
-        global $g_table_prefix;
+        $db = Core::$db;
 
         // if the user has request NO cache for this Activity Chart, always do a fresh query
-        if ($cache_update_frequency == "no_cache")
-            return dv_get_activity_info($form_id, $view_id, $date_range, $submission_count_group);
+        if ($cache_update_frequency == "no_cache") {
+            return self::getActivityInfo($form_id, $view_id, $date_range, $submission_count_group);
+        }
 
         // otherwise, check to see if there's the cached data within the cache frequency period specified
-        $now = ft_get_current_datetime();
-        $query = mysql_query("
-    SELECT *
-    FROM   {$g_table_prefix}module_data_visualization_cache
-    WHERE  vis_id = $vis_id AND
-           last_cached >= DATE_SUB(NOW(), INTERVAL $cache_update_frequency MINUTE)
-    LIMIT 1
-  ");
+        $now = CoreGeneral::getCurrentDatetime();
+        $db->query("
+            SELECT *
+            FROM   {PREFIX}module_data_visualization_cache
+            WHERE  vis_id = :vis_id AND
+                   last_cached >= DATE_SUB(NOW(), INTERVAL $cache_update_frequency MINUTE)
+            LIMIT 1
+        ");
+        $db->bind("vis_id", $vis_id);
+        $db->execute();
 
         // great! used the cached value
-        if (mysql_num_rows($query) == 1)
-        {
-            $result = mysql_fetch_assoc($query);
+        if ($db->numRows() == 1) {
+            $result = $db->fetch();
+
             return array(
-            "period"      => $submission_count_group,
-            "last_cached" => $result["last_cached"],
-            "data"        => unserialize($result["data"])
+                "period"      => $submission_count_group,
+                "last_cached" => $result["last_cached"],
+                "data"        => unserialize($result["data"])
             );
         }
 
         // Here, there's nothing valid in the cache. Run the query and cache the data.
-        $return_info = dv_get_activity_info($form_id, $view_id, $date_range, $submission_count_group);
+        $return_info = self::getActivityInfo($form_id, $view_id, $date_range, $submission_count_group);
 
-        mysql_query("DELETE FROM {$g_table_prefix}module_data_visualization_cache WHERE vis_id = $vis_id");
-        $data = ft_sanitize(serialize($return_info["data"]));
-
-        $insert_query = "INSERT INTO {$g_table_prefix}module_data_visualization_cache (vis_id, last_cached, data) VALUES ($vis_id, '$now', '$data')";
-        mysql_query($insert_query) or die($insert_query . " - " . mysql_error());
+        General::updateVisualizationCache($vis_id, $return_info["data"]);
 
         // also include the new cache date
         $return_info["last_cached"] = $now;
@@ -211,19 +166,17 @@ class ActivityCharts
      * @param string $date_range
      * @param string $submission_count_group "day" or "month" (week is VERY complicated - will add in later version)
      */
-    function dv_get_activity_info($form_id, $view_id, $date_range, $submission_count_group)
+    public static function getActivityInfo($form_id, $view_id, $date_range, $submission_count_group)
     {
-        global $g_table_prefix;
+        $db = Core::$db;
 
         $filter_sql_clauses = array();
-        if (!empty($view_id))
-        {
-            $filter_sql_clauses = ft_get_view_filter_sql($view_id);
+        if (!empty($view_id)) {
+            $filter_sql_clauses = ViewFilters::getViewFilterSql($view_id);
         }
 
         $date_range_clause = "";
-        switch ($date_range)
-        {
+        switch ($date_range) {
             case "year_to_date":
                 $date_range_clause = "YEAR(submission_date) = YEAR(CURDATE())";
                 break;
@@ -231,25 +184,9 @@ class ActivityCharts
                 $date_range_clause = "YEAR(submission_date) = YEAR(CURDATE()) AND MONTH(submission_date) = MONTH(CURDATE())";
                 break;
             default:
-                $map = array(
-                "last_7_days"    => 7,
-                "last_10_days"   => 10,
-                "last_14_days"   => 14,
-                "last_21_days"   => 21,
-                "last_30_days"   => 30,
-                "last_2_months"  => 60,
-                "last_3_months"  => 90,
-                "last_4_months"  => 120,
-                "last_5_months"  => 151,
-                "last_6_months"  => 182,
-                "last_12_months" => 365,
-                "last_2_years"   => 730,
-                "last_3_years"   => 1095,
-                "last_4_years"   => 1460,
-                "last_5_years"   => 1825
-                );
-                if (array_key_exists($date_range, $map))
-                    $date_range_clause = "submission_date >= DATE_SUB(NOW(), INTERVAL {$map[$date_range]} DAY)";
+                if (array_key_exists($date_range, self::$intervalMap)) {
+                    $date_range_clause = "submission_date >= DATE_SUB(NOW(), INTERVAL {self::$intervalMap[$date_range]} DAY)";
+                }
                 break;
         }
 
@@ -263,64 +200,59 @@ class ActivityCharts
         $where_clause = "WHERE " . implode(" AND ", $where_clauses);
 
         // do a quick test to confirm that there's at least a single result with the parameters specified
-        $count_test_query = mysql_query("
-    SELECT count(*) as total
-    FROM {$g_table_prefix}form_{$form_id}
-    $where_clause
-  ");
-        $count_test_result = mysql_fetch_assoc($count_test_query);
+        $db->query("
+            SELECT count(*)
+            FROM {PREFIX}form_{$form_id}
+            $where_clause
+        ");
+        $db->execute();
+        $count = $db->fetch(PDO::FETCH_COLUMN);
 
         // shut it down!
-        if ($count_test_result["total"] == 0)
-        {
+        if ($count == 0) {
             return array(
-            "period" => $submission_count_group,
-            "data"   => array()
+                "period" => $submission_count_group,
+                "data"   => array()
             );
         }
 
-        list($select_clause, $stats) = _dv_get_activity_account_select_query_info($submission_count_group, $date_range,
-        $date_range_clause, $form_id, $view_id, $filter_sql_clauses);
+        list ($select_clause, $stats) = self::getActivityAccountSelectQueryInfo($submission_count_group, $date_range,
+            $date_range_clause, $form_id, $filter_sql_clauses);
 
-        $query = mysql_query("
-    SELECT $select_clause, count(*) as total
-    FROM {$g_table_prefix}form_{$form_id}
-    $where_clause
-    GROUP BY period
-  ");
+        $db->query("
+            SELECT $select_clause, count(*) as total
+            FROM {PREFIX}form_{$form_id}
+            $where_clause
+            GROUP BY period
+        ");
+        $db->execute();
+        $rows = $db->fetchAll();
 
-        while ($row = mysql_fetch_assoc($query))
-        {
-            if (array_key_exists($row["period"], $stats))
+        foreach ($rows as $row) {
+            if (array_key_exists($row["period"], $stats)) {
                 $stats[$row["period"]]["data"] = $row["total"];
-            else
-            {
-                if ($submission_count_group == "day")
-                {
-                    $date = date("M jS", ft_convert_datetime_to_timestamp($row["period"] . " 00:00:00"));
-                }
-                else
-                {
+            } else {
+                if ($submission_count_group == "day") {
+                    $date = date("M jS", CoreGeneral::convertDatetimeToTimestamp($row["period"] . " 00:00:00"));
+                } else {
                     list($year, $month) = explode("/", $row["period"]);
                     $date = date("M Y", mktime(0, 0, 0, $month, 1, $year));
                 }
-
                 $stats[$row["period"]] = array(
-                "label" => $date,
-                "data"  => $row["total"]
+                    "label" => $date,
+                    "data"  => $row["total"]
                 );
             }
         }
 
         $results = array();
-        while (list($key, $value) = each($stats))
-        {
+        while (list($key, $value) = each($stats)) {
             $results[] = $value;
         }
 
         return array(
-        "period" => $submission_count_group,
-        "data"   => $results
+            "period" => $submission_count_group,
+            "data"   => $results
         );
     }
 
@@ -334,53 +266,51 @@ class ActivityCharts
      * @param integer $view_id
      * @param array
      */
-    function _dv_get_activity_account_select_query_info($submission_count_group, $date_range,
-    $date_range_clause, $form_id, $view_id, $filter_sql_clauses)
+    public static function getActivityAccountSelectQueryInfo($submission_count_group, $date_range, $date_range_clause,
+        $form_id, $filter_sql_clauses)
     {
-        global $g_table_prefix;
+        $db = Core::$db;
 
         $filter_sql_clause = "";
-        if (!empty($filter_sql_clauses))
+        if (!empty($filter_sql_clauses)) {
             $filter_sql_clause = "(" . implode(" AND ", $filter_sql_clauses) . ")";
+        }
 
         // SELECT clause
         $select_clause = "";
-        if ($submission_count_group == "day")
+        if ($submission_count_group == "day") {
             $select_clause = "DATE(submission_date) as period";
-        else if ($submission_count_group == "month")
+        } else if ($submission_count_group == "month") {
             $select_clause = "CONCAT(YEAR(submission_date), '/', MONTH(submission_date)) as period";
+        }
 
         $day_in_secs = 60 * 60 * 24;
 
         // now figure out what days / months we actually need to return data for
         $stats  = array();
-        if ($submission_count_group == "day")
-        {
+        if ($submission_count_group == "day") {
             // if no date range clause was specified, the user wants to return everything. In which case, the start date
             // is dependant on what's stored in the database. [The end date is ALWAYS today - regardless of how messed up the
             // submission data info actually is]
             $first_day = "";
-            if (empty($date_range_clause))
-            {
+            if (empty($date_range_clause))  {
                 $where_clause = "";
-                if (!empty($filter_sql_clause))
+                if (!empty($filter_sql_clause)) {
                     $where_clause = "WHERE $filter_sql_clause";
+                }
 
-                $first_day_query = mysql_query("
-        SELECT DATE(submission_date) as d
-        FROM   {$g_table_prefix}form_{$form_id}
-        $where_clause
-        ORDER BY submission_date ASC
-        LIMIT 1
-      ");
+                $db->query("
+                    SELECT DATE(submission_date)
+                    FROM   {PREFIX}form_{$form_id}
+                    $where_clause
+                    ORDER BY submission_date ASC
+                    LIMIT 1
+                ");
+                $db->execute();
 
-                $first_day_result = mysql_fetch_assoc($first_day_query);
-                $first_day = $first_day_result["d"];
-            }
-            else
-            {
-                switch ($date_range)
-                {
+                $first_day = $db->fetch(PDO::FETCH_COLUMN);
+            } else {
+                switch ($date_range) {
                     case "year_to_date":
                         $first_day = date("Y") . "-01-01";
                         break;
@@ -388,44 +318,24 @@ class ActivityCharts
                         $first_day = date("Y-m") . "-01";
                         break;
                     default:
-                        $map = array(
-                        "last_7_days"    => 7,
-                        "last_10_days"   => 10,
-                        "last_14_days"   => 14,
-                        "last_21_days"   => 21,
-                        "last_30_days"   => 30,
-                        "last_2_months"  => 60,
-                        "last_3_months"  => 90,
-                        "last_4_months"  => 120,
-                        "last_5_months"  => 151,
-                        "last_6_months"  => 182,
-                        "last_12_months" => 365,
-                        "last_2_years"   => 730,
-                        "last_3_years"   => 1095,
-                        "last_4_years"   => 1460,
-                        "last_5_years"   => 1825
-                        );
-                        $first_day = date("Y-m-d", date("U") - ($map[$date_range] * $day_in_secs));
+                        $first_day = date("Y-m-d", date("U") - (self::$intervalMap[$date_range] * $day_in_secs));
                         break;
                 }
             }
 
             // each result is a DAY. Make a list of all possible days; we'll overlay the actual counts after
             // we get the results of the DB query. This ensures there are no gaps [be better to do this client-side...!]
-            $current_day_unix_time = ft_convert_datetime_to_timestamp($first_day . " 00:00:00");
-            $last_day_unix_time    = ft_convert_datetime_to_timestamp(date("Y-m-d") . " 00:00:00");
-            while ($current_day_unix_time <= $last_day_unix_time)
-            {
+            $current_day_unix_time = CoreGeneral::convertDatetimeToTimestamp($first_day . " 00:00:00");
+            $last_day_unix_time    = CoreGeneral::convertDatetimeToTimestamp(date("Y-m-d") . " 00:00:00");
+            while ($current_day_unix_time <= $last_day_unix_time) {
                 $date = date("Y-m-d", $current_day_unix_time);
                 $stats[$date] = array(
-                "label" => date("M jS", ft_convert_datetime_to_timestamp($date . " 00:00:00")),
-                "data"  => 0
+                    "label" => date("M jS", CoreGeneral::convertDatetimeToTimestamp($date . " 00:00:00")),
+                    "data"  => 0
                 );
                 $current_day_unix_time += $day_in_secs;
             }
-        }
-        else if ($submission_count_group == "week")
-        {
+        } else if ($submission_count_group == "week") {
             /*
                 $select = "CONCAT(YEAR(submission_date), '/', WEEK(submission_date, 0)) as period";
 
@@ -437,7 +347,7 @@ class ActivityCharts
                 {
                   $first_day_query = mysql_query("
                     SELECT CONCAT(YEAR(submission_date), '/', WEEK(submission_date, 0)) as wk
-                    FROM   {$g_table_prefix}form_{$form_id}
+                    FROM   {PREFIX}form_{$form_id}
                     ORDER BY submission_date ASC
                     LIMIT 1
                   ");
@@ -445,7 +355,7 @@ class ActivityCharts
 
                   $last_day_query  = mysql_query("
                     SELECT CONCAT(YEAR(submission_date), '/', WEEK(submission_date, 0)) as wk
-                    FROM   {$g_table_prefix}form_{$form_id}
+                    FROM   {PREFIX}form_{$form_id}
                     ORDER BY submission_date DESC
                     LIMIT 1
                   ");
@@ -499,47 +409,44 @@ class ActivityCharts
                 {
                   $first_day_query = mysql_query("
                     SELECT DATE(submission_date) as d
-                    FROM   {$g_table_prefix}form_{$form_id}
+                    FROM   {PREFIX}form_{$form_id}
                     WHERE  $date_range_clause
                     ORDER BY submission_date ASC
                     LIMIT 1
                   ");
 
                   $first_day_result = mysql_fetch_assoc($first_day_query);
-                  $first_day = ft_convert_datetime_to_timestamp($first_day_result["d"] . " 00:00:00");
+                  $first_day = General::convertDatetimeToTimestamp($first_day_result["d"] . " 00:00:00");
 
                   // since the user was searching a specific date range, all of them have today as the final day
                   $last_day = date("Y-m-d");
                 }
             */
 
-        }
-        else if ($submission_count_group == "month")
-        {
+        } else if ($submission_count_group == "month") {
             // if no date range clause was specified, the user wants to return everything. In which case, the start date
             // is therefore dependant on whatever's stored in the database
             $first_day = "";
             list($last_year, $last_month, $last_day) = explode("-", date("Y-m-d"));
-            if (empty($date_range_clause))
-            {
+            if (empty($date_range_clause)) {
                 $where_clause = "";
-                if (!empty($filter_sql_clause))
+                if (!empty($filter_sql_clause)) {
                     $where_clause = "WHERE $filter_sql_clause";
+                }
 
-                $first_month_query = mysql_query("
-        SELECT DATE(submission_date) as d
-        FROM   {$g_table_prefix}form_{$form_id}
-        $where_clause
-        ORDER BY submission_date ASC
-        LIMIT 1
-      ");
-                $first_month_result = mysql_fetch_assoc($first_month_query);
-                list($start_year, $start_month, $start_day) = explode("-", $first_month_result["d"]);
-            }
-            else
-            {
-                switch ($date_range)
-                {
+                $db->query("
+                    SELECT DATE(submission_date)
+                    FROM   {PREFIX}form_{$form_id}
+                    $where_clause
+                    ORDER BY submission_date ASC
+                    LIMIT 1
+                ");
+                $db->execute();
+
+                $first_month = $db->fetch(PDO::FETCH_COLUMN);
+                list ($start_year, $start_month, $start_day) = explode("-", $first_month);
+            } else {
+                switch ($date_range) {
                     case "year_to_date":
                         $first_day = date("Y") . "-01-01";
                         break;
@@ -547,24 +454,7 @@ class ActivityCharts
                         $first_day = date("Y-m") . "-01";
                         break;
                     default:
-                        $map = array(
-                        "last_7_days"    => 7,
-                        "last_10_days"   => 10,
-                        "last_14_days"   => 14,
-                        "last_21_days"   => 21,
-                        "last_30_days"   => 30,
-                        "last_2_months"  => 60,
-                        "last_3_months"  => 90,
-                        "last_4_months"  => 120,
-                        "last_5_months"  => 151,
-                        "last_6_months"  => 182,
-                        "last_12_months" => 365,
-                        "last_2_years"   => 730,
-                        "last_3_years"   => 1095,
-                        "last_4_years"   => 1460,
-                        "last_5_years"   => 1825
-                        );
-                        $first_day = date("Y-m-d", date("U") - ($map[$date_range] * $day_in_secs));
+                        $first_day = date("Y-m-d", date("U") - (self::$intervalMap[$date_range] * $day_in_secs));
                         break;
                 }
                 list($start_year, $start_month, $start_day) = explode("-", $first_day);
@@ -576,21 +466,111 @@ class ActivityCharts
             $end_int   = ($last_year * 12) + $last_month;
 
             $curr_int = $start_int;
-            while ($curr_int <= $end_int)
-            {
+            while ($curr_int <= $end_int) {
                 $year  = floor($curr_int / 12);
                 $month = $curr_int % 12;
                 $u = mktime(0, 0, 0, $month, 1, $year);
                 $key = date("Y/n", $u);
                 $stats[$key] = array(
-                "label" => date("M Y", $u),
-                "data"  => 0
+                    "label" => date("M Y", $u),
+                    "data"  => 0
                 );
-
                 $curr_int++;
             }
         }
 
         return array($select_clause, $stats);
+    }
+
+
+    private static function updateVisualizationMainTab($vis_id, $info)
+    {
+        $db = Core::$db;
+
+        $db->query("
+            UPDATE {PREFIX}module_data_visualizations
+            SET    vis_name = :vis_name,
+                   form_id = :form_id,
+                   cache_update_frequency = :cache_update_frequency
+            WHERE  vis_id = $vis_id
+        ");
+        $db->bindAll(array(
+            "vis_name" => $info["vis_name"],
+            "form_id" => $info["form_id"],
+            "cache_update_frequency" => $info["cache_update_frequency"],
+            "vis_id" => $vis_id
+        ));
+        $db->execute();
+    }
+
+
+    private static function updateVisualizationAppearanceTab($vis_id, $info)
+    {
+        $db->query("
+            UPDATE {PREFIX}module_data_visualizations
+            SET    chart_type = :chart_type,
+                   date_range = :date_range,
+                   submission_count_group = :submission_count_group,
+                   colour = :colour,
+                   line_width = :line_width
+            WHERE  vis_id = :vis_id
+        ");
+        $db->bindAll(array(
+            "chart_type" => $info["chart_type"],
+            "date_range" => $info["date_range"],
+            "submission_count_group" => $info["submission_count_group"],
+            "colour" => $info["colour"],
+            "line_width" => isset($info["line_width"]) ? $info["line_width"] : 2,
+            "vis_id" => $vis_id
+        ));
+        $db->execute();
+    }
+
+
+    private static function updateVisualizationPermissionsTab($vis_id, $info)
+    {
+        $db = Core::$db;
+
+        $selected_client_ids = (isset($info["selected_client_ids"])) ? $info["selected_client_ids"] : array();
+
+        $db->query("
+            DELETE FROM {PREFIX}module_data_visualization_clients
+            WHERE vis_id = :vis_id
+        ");
+        $db->bind("vis_id", $vis_id);
+        $db->execute();
+
+        foreach ($selected_client_ids as $account_id) {
+            $db->query("
+                INSERT INTO {PREFIX}module_data_visualization_clients (vis_id, account_id)
+                VALUES ($vis_id, $account_id)
+            ");
+            $db->bindAll(array(
+            "vis_id" => $vis_id,
+            "account_id" => $account_id
+            ));
+            $db->execute();
+        }
+
+        $access_view_mapping = $info["access_view_mapping"];
+        $access_views = "";
+        if ($access_view_mapping != "all") {
+            $view_ids = (isset($info["view_ids"])) ? $info["view_ids"] : array();
+            $access_views = implode(",", $view_ids);
+        }
+
+        $db->query("
+            UPDATE {PREFIX}module_data_visualizations
+            SET    access_type = :access_type,
+                   access_view_mapping = :access_view_mapping,
+                   access_views = :access_views
+            WHERE  vis_id = :vis_id
+        ");
+        $db->bindAll(array(
+            "access_type" => $info["access_type"],
+            "access_view_mapping" => $access_view_mapping,
+            "access_views" => $access_views,
+            "vis_id" => $vis_id
+        ));
     }
 }

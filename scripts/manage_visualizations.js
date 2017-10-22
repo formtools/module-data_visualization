@@ -14,7 +14,7 @@ var vis_ns = {
   thumb_chart_width: 250,
   full_size_chart_height: 300,
   full_size_chart_width: 692
-}
+};
 
 
 /**
@@ -100,7 +100,7 @@ vis_ns.get_form_fields = function(form_id) {
     vis_ns.form_fields["form_" + form_id] = { is_loaded: false };
 
     $.ajax({
-      url:      g.root_url + "/modules/data_visualization/global/code/actions.php",
+      url:      g.root_url + "/modules/data_visualization/code/actions.php",
       data: {
         action: "get_form_fields",
         form_id: form_id
@@ -132,7 +132,7 @@ vis_ns.get_view_fields = function(view_id) {
     vis_ns.view_fields["view_" + view_id] = { is_loaded: false };
 
     $.ajax({
-      url: g.root_url + "/modules/data_visualization/global/code/actions.php",
+      url: g.root_url + "/modules/data_visualization/code/actions.php",
       data: {
         action:  "get_view_fields",
         view_id: view_id
@@ -234,7 +234,7 @@ vis_ns.update_activity_chart_data = function() {
       vis_ns.redraw_activity_chart();
     } else {
       $.ajax({
-        url:      g.root_url + "/modules/data_visualization/global/code/actions.php",
+        url:      g.root_url + "/modules/data_visualization/code/actions.php",
         type:     "POST",
         dataType: "json",
         data: {
@@ -368,7 +368,7 @@ vis_ns.update_field_chart_data = function() {
 
   if (view_id && form_id && field_id) {
     $.ajax({
-      url:      g.root_url + "/modules/data_visualization/global/code/actions.php",
+      url:      g.root_url + "/modules/data_visualization/code/actions.php",
       type:     "POST",
       dataType: "json",
       data: {
@@ -408,6 +408,8 @@ vis_ns.redraw_field_chart = function() {
     data.addColumn("number", "Count");
     if (json.data.length) {
       data.addRows(json.data.length);
+      console.log(json.data);
+
       for (var i=0, j=json.data.length; i<j; i++) {
         data.setValue(i, 0, json.data[i].label.toString());
         data.setValue(i, 1, json.data[i].data);
@@ -506,7 +508,7 @@ vis_ns.init_create_page_and_menu_item_dialog = function() {
           click: function() {
             ft.dialog_activity_icon($("#add_to_menu_dialog"), "show");
             $.ajax({
-              url: g.root_url + "/modules/data_visualization/global/code/actions.php",
+              url: g.root_url + "/modules/data_visualization/code/actions.php",
               data: {
                 action:        "create_page_and_menu_item",
                 vis_id:        $("#vis_id").val(),
@@ -551,7 +553,7 @@ vis_ns.select_menu = function(menu_id) {
   } else {
   ft.dialog_activity_icon($("#add_to_menu_dialog"), "show");
     $.ajax({
-      url: g.root_url + "/modules/data_visualization/global/code/actions.php",
+      url: g.root_url + "/modules/data_visualization/code/actions.php",
       data: {
         action: "get_menu",
         menu_id: menu_id

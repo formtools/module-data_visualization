@@ -165,10 +165,10 @@ $L["phrase_edit_this_field_chart"] = "Edit this Field Chart";
 
 $L["text_pages_module_intro"] = "This module is compatible with the Pages module. You can embed any visualization into a Page by copying and pasting the code below - or, just click the button below to automatically create and configure a new page containing this visualization.";
 $L["text_no_visualizations"] = "There are no visualizations set up yet. Click the button below to get started!";
-$L["text_help"] = "Please see our <a href=\"http://modules.formtools.org/data_visualization/documentation.php\" target=\"_blank\">online help documentation</a> for information on how to use this module.";
+$L["text_help"] = "Please see our <a href=\"https://docs.formtools.org/modules/data_visualization/\" target=\"_blank\">online help documentation</a> for information on how to use this module.";
 $L["text_no_visualization_found_in_search"] = "Sorry, no visualizations were found. Try broadening your search criteria.";
-$L["text_activity_chart_desc"] = "<b>Activity Charts</b> graph the activity on your forms. You may choose from Line, Area or Column Charts.";
-$L["text_field_chart_desc"] = "<b>Field Charts</b> graph the distribution of content within a single form field. You may choose from Pie, Bar or Column Charts.";
+$L["text_activity_chart_desc"] = "<b>Activity Charts</b> graph the activity on your forms. You can choose from Line, Area or Column Charts.";
+$L["text_field_chart_desc"] = "<b>Field Charts</b> graph the distribution of content within a single form field. You can choose from Pie, Bar or Column Charts.";
 $L["text_activity_chart_intro"] = "Activity Charts display the frequency of submissions to your forms in a line or area graph. They are automatically displayed in the Visualization dialog window on the Submission Listing pages according to the settings below.";
 $L["text_cache_frequency_explanation"] = "Calculating all the statistics to create the chart can take a long time, so the Data Visualization module uses a cache to store all data for faster retrieval. This setting lets you control how often the data for this visualization cache should be updated.";
 $L["text_examples_contain_dud_data"] = "The example visualizations below contain dud data, just so you can see what they will look like.";

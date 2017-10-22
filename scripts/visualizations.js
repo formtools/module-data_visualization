@@ -1,5 +1,5 @@
 /**
- * Code for	 the Data Visualizations dialog window. This is used on the Submission Listing pages for the admin and
+ * Code for	the Data Visualizations dialog window. This is used on the Submission Listing pages for the admin and
  * client, but also in the Admin section to provide a simple way to view all visualizations in a result set. It
  * contains all the juicy javascript to retrieve and display the visualization data, handle the dialog window
  * creation, etc.
@@ -12,7 +12,7 @@
  */
 
 if (typeof google != "undefined") {
-  google.load("visualization", "1", {packages:["corechart"]});
+  google.charts.load('current', {'packages':['corechart']});
 }
 
 var dv_ns = {};
@@ -28,7 +28,7 @@ dv_ns.visualization_dialog = $("<div id=\"dv_visualization_dialog\">"
                              + "</div>"
                           + "</div>");
 dv_ns.preload_loading_icon = new Image(32, 32);
-dv_ns.preload_loading_icon.src = g.root_url + "/global/images/loading.gif";
+dv_ns.preload_loading_icon.src = g.root_url + "/images/loading.gif";
 dv_ns.context = ""; // manage_visualizations, admin_submission_listing, client_submission_listing - set on page load
 
 // keeps track of the current state of the dialog
@@ -39,9 +39,9 @@ dv_ns.dialog_opened = false;
 
 $(function() {
   $("#dv_vis_refresh_cache").live("click", function() {
-    $(this).css("background", "transparent url(" + g.root_url + "/global/images/loading_small.gif) no-repeat center center");
+    $(this).css("background", "transparent url(" + g.root_url + "/images/loading_small.gif) no-repeat center center");
     $.ajax({
-      url:      g.root_url + "/modules/data_visualization/global/code/actions.php",
+      url:      g.root_url + "/modules/data_visualization/code/actions.php",
       type:     "POST",
       dataType: "json",
       data: {
@@ -159,7 +159,7 @@ dv_ns.open_visualization_dialog = function() {
   // now create separate Ajax requests for each visualization
   for (var i=0; i<num_visualizations; i++) {
     $.ajax({
-      url:      g.root_url + "/modules/data_visualization/global/code/actions.php",
+      url:      g.root_url + "/modules/data_visualization/code/actions.php",
       type:     "POST",
       dataType: "json",
       data: {

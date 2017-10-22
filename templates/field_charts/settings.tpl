@@ -15,7 +15,7 @@
 
   {include file='messages.tpl'}
 
-  {include file="../../modules/data_visualization/no_internet_connection.tpl"}
+  {include file="../../no_internet_connection.tpl"}
 
   <div class="margin_bottom_large">
     {$L.text_default_field_chart_settings_page}

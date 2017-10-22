@@ -33,7 +33,7 @@
 
     {include file="messages.tpl"}
 
-    {include file="../../modules/data_visualization/no_internet_connection.tpl"}
+    {include file="../../no_internet_connection.tpl"}
 
     <div class="margin_bottom_large">
       {$L.text_add_visualization}
@@ -53,7 +53,7 @@
 	    <tr>
 	      <td class="pad_left_small">{$LANG.word_form}</td>
 	      <td>
-	        {forms_dropdown name_id="form_id" omit_forms=$omit_forms include_blank_option=true}
+	        {forms_dropdown name_id="form_id" include_blank_option=true}
 	      </td>
 	    </tr>
 	    <tr>

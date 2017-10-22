@@ -1,29 +1,27 @@
 {include file='modules_header.tpl'}
 
-  <table cellpadding="0" cellspacing="0">
-  <tr>
-    <td width="45"><a href="index.php"><img src="images/icon_visualization.png" border="0" width="34" height="34" /></a></td>
-    <td class="title">
-      <a href="../../admin/modules">{$LANG.word_modules}</a>
-      <span class="joiner">&raquo;</span>
-      {$L.module_name}
-    </td>
-  </tr>
-  </table>
+    <table cellpadding="0" cellspacing="0">
+    <tr>
+        <td width="45"><a href="index.php"><img src="images/icon_visualization.png" border="0" width="34" height="34" /></a></td>
+        <td class="title">
+            <a href="../../admin/modules">{$LANG.word_modules}</a>
+            <span class="joiner">&raquo;</span>
+            {$L.module_name}
+        </td>
+    </tr>
+    </table>
 
-  {include file='messages.tpl'}
+    {include file='messages.tpl'}
 
-  {include file="../../modules/data_visualization/no_internet_connection.tpl"}
+    {include file="../no_internet_connection.tpl"}
 
-  {if $total_results == 0}
-
-    <div class="notify" class="margin_bottom_large">
-      <div style="padding:8px">
-        {$L.text_no_visualizations}
-      </div>
-    </div>
-
-  {else}
+    {if $total_results == 0}
+        <div class="notify" class="margin_bottom_large">
+            <div style="padding:8px">
+                {$L.text_no_visualizations}
+            </div>
+        </div>
+    {else}
 
     <div id="search_form" class=" margin_bottom_large">
       <form action="{$same_page}" method="post">

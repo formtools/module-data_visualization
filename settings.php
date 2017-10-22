@@ -4,6 +4,7 @@ require_once("../../global/library.php");
 
 use FormTools\Core;
 use FormTools\Modules;
+use FormTools\Modules\DataVisualization\Visualizations;
 
 $module = Modules::initModulePage("admin");
 $L = $module->getLangStrings();
@@ -12,7 +13,7 @@ $LANG = Core::$L;
 $success = true;
 $message = "";
 if (isset($request["clear_cache"])) {
-	list($success, $message) = dv_clear_visualization_cache();
+	list($success, $message) = Visualizations::clearVisualizationCache();
 }
 
 if (isset($request["update"])) {
