@@ -51,7 +51,7 @@ class ActivityCharts
                 INSERT INTO {PREFIX}module_data_visualizations (vis_name, vis_type, chart_type,
                     form_id, view_id, cache_update_frequency, date_range, submission_count_group, colour, line_width)
                 VALUE (:vis_name, :vis_type, :chart_type, :form_id, :view_id, :cache_update_frequency,
-                    :date_range, :submission_count_group, :colour, :line_width
+                    :date_range, :submission_count_group, :colour, :line_width)
             ");
             $db->bindAll(array(
                 "vis_name" => $info["vis_name"],
@@ -67,7 +67,7 @@ class ActivityCharts
             ));
             $db->execute();
         } catch (PDOException $e) {
-            return array(false, $L["notify_error_creating_activity_chart"], "");
+            return array(false, $L["notify_error_creating_activity_chart"] . $e->getMessage(), "");
         }
 
         return array(true, $L["notify_activity_chart_created"], $db->getInsertId());
@@ -185,7 +185,8 @@ class ActivityCharts
                 break;
             default:
                 if (array_key_exists($date_range, self::$intervalMap)) {
-                    $date_range_clause = "submission_date >= DATE_SUB(NOW(), INTERVAL {self::$intervalMap[$date_range]} DAY)";
+                    $value = self::$intervalMap[$date_range];
+                    $date_range_clause = "submission_date >= DATE_SUB(NOW(), INTERVAL {$value} DAY)";
                 }
                 break;
         }

@@ -235,21 +235,19 @@ class Visualizations
      *
      * @param integer $vis_id
      */
-    public static function clearVisualizationCache($vis_id = "", $L)
+    public static function clearVisualizationCache($vis_id = "")
     {
         $db = Core::$db;
 
-        $message = $L["notify_visualization_cache_cleared"];
         $where_clause = "";
         if (!empty($vis_id)) {
             $where_clause = "WHERE vis_id = $vis_id";
-            $message = $L["notify_specific_visualization_cache_cleared"];
         }
 
         $db->query("DELETE FROM {PREFIX}module_data_visualization_cache $where_clause");
         $db->execute();
 
-        return array(true, $message);
+        return array(true, "");
     }
 
 
@@ -391,11 +389,11 @@ class Visualizations
             }
         }
 
-        dv_display_visualization($vis_id, $width, $height, $overridden_settings);
+        self::displayVisualization($vis_id, $width, $height, $overridden_settings);
     }
 
 
-    function dv_display_visualization($vis_id, $width, $height, $overridden_settings = array())
+    public static function displayVisualization($vis_id, $width, $height, $overridden_settings = array())
     {
         global $g_cache;
 
@@ -404,7 +402,6 @@ class Visualizations
         } else {
             $g_cache["data_visualization_{$vis_id}_count"]++;
         }
-
 
         $id_suffix = $g_cache["data_visualization_{$vis_id}_count"];
 
@@ -593,6 +590,13 @@ END;
         $results = self::searchVisualizations($search_criteria);
 
         $return_info = array("prev_link" => "", "next_link" => "");
+
+        // it's possible that there are NO visualization IDs: the user may have done a search that returns no results
+        // but be editing a visualization on a different tab
+        if (count($results) === 0) {
+            return $return_info;
+        }
+
         $sorted_vis_ids = array();
         $vis_id_to_types = array();
         foreach ($results as $vis_info) {

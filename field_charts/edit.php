@@ -1,66 +1,75 @@
 <?php
 
 require_once("../../../global/library.php");
-ft_init_module_page();
-$request = array_merge($_POST, $_GET);
+
+use FormTools\Core;
+use FormTools\General as CoreGeneral;
+use FormTools\Modules;
+use FormTools\Modules\DataVisualization\FieldCharts;
+use FormTools\Modules\DataVisualization\General;
+use FormTools\Modules\DataVisualization\Visualizations;
+
+$module = Modules::initModulePage("admin");
+$L = $module->getLangStrings();
+$LANG = Core::$L;
 
 $vis_id = isset($request["vis_id"]) ? $request["vis_id"] : "";
-if (empty($vis_id) || !is_numeric($vis_id))
-{
-  header("location: ../");
-  exit;
+if (empty($vis_id) || !is_numeric($vis_id)) {
+    header("location: ../");
+    exit;
 }
 
-if (isset($_POST["update"]))
-{
-	list($g_success, $g_message) = dv_update_field_chart($request["vis_id"], $request["tab"], $request);
+$success = true;
+$message = "";
+if (isset($_POST["update"])) {
+	list ($success, $message) = FieldCharts::updateFieldChart($request["vis_id"], $request["tab"], $request, $L);
 }
 
-$vis_info = dv_get_visualization($vis_id);
-$js = dv_get_form_view_mapping_js();
+$vis_info = Visualizations::getVisualization($vis_id, $L);
+$js = General::getFormViewMappingJs();
 
 // store the current selected tab in memory
-$page = ft_load_module_field("data_visualization", "page", "edit_chart", "main");
+$page = Modules::loadModuleField("data_visualization", "page", "edit_chart", "main");
 
-$same_page = ft_get_clean_php_self();
+$same_page = CoreGeneral::getCleanPhpSelf();
 $tabs = array(
-  "main"        => array("tab_label" => $LANG["word_main"], "tab_link" => "{$same_page}?page=main&vis_id={$vis_id}"),
-  "appearance"  => array("tab_label" => $L["word_appearance"], "tab_link" => "{$same_page}?page=appearance&vis_id={$vis_id}"),
-  "permissions" => array("tab_label" => $LANG["word_permissions"], "tab_link" => "{$same_page}?page=permissions&vis_id={$vis_id}"),
-  "advanced"    => array("tab_label" => $LANG["word_advanced"], "tab_link" => "{$same_page}?page=advanced&vis_id={$vis_id}")
+    "main"        => array("tab_label" => $LANG["word_main"], "tab_link" => "{$same_page}?page=main&vis_id={$vis_id}"),
+    "appearance"  => array("tab_label" => $L["word_appearance"], "tab_link" => "{$same_page}?page=appearance&vis_id={$vis_id}"),
+    "permissions" => array("tab_label" => $LANG["word_permissions"], "tab_link" => "{$same_page}?page=permissions&vis_id={$vis_id}"),
+    "advanced"    => array("tab_label" => $LANG["word_advanced"], "tab_link" => "{$same_page}?page=advanced&vis_id={$vis_id}")
 );
 
+$links = Visualizations::getTabsetLinks($vis_id);
+
 // start compiling the page vars here (save duplicate code!)
-$page_vars = array();
-$page_vars["page"] = $page;
-$page_vars["tabs"] = $tabs;
-$page_vars["show_tabset_nav_links"] = true;
+$page_vars = array(
+    "g_success" => $success,
+    "g_message" => $message,
+    "page" => $page,
+    "tabs" => $tabs,
+    "show_tabset_nav_links" => true,
+    "prev_tabset_link" => $links["prev_link"],
+    "next_tabset_link" => $links["next_link"],
+    "vis_id" => $vis_id,
+    "vis_info" => $vis_info
+);
 
-$links = dv_get_tabset_links($vis_id);
-$page_vars["prev_tabset_link"] = $links["prev_link"];
-$page_vars["next_tabset_link"] = $links["next_link"];
-
-$page_vars["vis_id"] = $vis_id;
-$page_vars["vis_info"] = $vis_info;
-
-switch ($page)
-{
-  case "main":
-    include("page_main.php");
-    break;
-  case "appearance":
-    include("page_appearance.php");
-    break;
-  case "permissions":
-    include("page_permissions.php");
-    break;
-  case "advanced":
-    include("page_advanced.php");
-    break;
-
-  default:
-    include("page_main.php");
-    break;
+switch ($page) {
+    case "main":
+        include("page_main.php");
+        break;
+    case "appearance":
+        include("page_appearance.php");
+        break;
+    case "permissions":
+        include("page_permissions.php");
+        break;
+    case "advanced":
+        include("page_advanced.php");
+        break;
+    default:
+        include("page_main.php");
+        break;
 }
 
 

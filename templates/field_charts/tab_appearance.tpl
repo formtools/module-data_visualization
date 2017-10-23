@@ -8,7 +8,7 @@
     <input type="hidden" name="vis_name" id="vis_name" value="{$vis_info.vis_name|escape}" />
     <input type="hidden" name="tab" value="appearance" />
 
-    {include file="../../modules/data_visualization/no_internet_connection.tpl"}
+    {include file="../../no_internet_connection.tpl"}
 
     <table cellspacing="0" cellpadding="0" width="100%" class="margin_bottom_large">
     <tr>

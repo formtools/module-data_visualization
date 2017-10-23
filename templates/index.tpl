@@ -79,7 +79,7 @@
             <tr>
               <td>
                 <input type="radio" name="account_type" value="client" id="at2"
-                  {if $account_type == "client"}checked{/if} /> <label for="at2">{$L.word_clients}</label>
+                  {if $account_type == "client"}checked{/if} /> <label for="at2">{$LANG.word_clients}</label>
                 {clients_dropdown name_id="client_id" default=$client_id include_blank_option=true blank_option=$L.phrase_all_accounts}
               </td>
             </tr>

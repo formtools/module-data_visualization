@@ -28,7 +28,7 @@ dv_ns.visualization_dialog = $("<div id=\"dv_visualization_dialog\">"
                              + "</div>"
                           + "</div>");
 dv_ns.preload_loading_icon = new Image(32, 32);
-dv_ns.preload_loading_icon.src = g.root_url + "/images/loading.gif";
+dv_ns.preload_loading_icon.src = g.root_url + "/global/images/loading.gif";
 dv_ns.context = ""; // manage_visualizations, admin_submission_listing, client_submission_listing - set on page load
 
 // keeps track of the current state of the dialog
@@ -200,7 +200,7 @@ dv_ns.get_visualization_response = function(json) {
       dv_ns.draw_field_chart(json, false, target_el, g.vis_tile_size, g.vis_tile_size - 20);
     }
   }
-}
+};
 
 
 dv_ns.draw_activity_chart = function(json, show_title, target_el, width, height) {
@@ -253,9 +253,6 @@ dv_ns.draw_activity_chart = function(json, show_title, target_el, width, height)
 
 
 dv_ns.draw_field_chart = function(json, is_full_size, target_el, width, height) {
-  var vis_id     = json.vis_id;
-  var chart_type = json.chart_type;
-
   var data = new google.visualization.DataTable();
   data.addColumn("string", "");
   data.addColumn("number", "Submissions");
@@ -267,8 +264,9 @@ dv_ns.draw_field_chart = function(json, is_full_size, target_el, width, height) 
 
   data.addRows(num_rows);
   for (var i=0, j=num_rows; i<j; i++) {
-    data.setValue(i, 0, json.data[i].label.toString());
-    data.setValue(i, 1, json.data[i].data);
+    var label = (json.data[i].field_value === null) ? "" : json.data[i].field_value.toString();
+    data.setValue(i, 0, label);
+    data.setValue(i, 1, json.data[i].count);
   }
 
   switch (json.chart_type){
@@ -333,7 +331,7 @@ dv_ns.resize_dialog = function(e, ui) {
 dv_ns.redraw_full_screen_visualization = function(vis_id) {
   dv_ns.selected_vis_id = vis_id;
   dv_ns.current_page = "details";
-  var width  = $("#dv_visualization_dialog").dialog("option", "width") - 20;
+  var width  = $("#dv_visualization_dialog").dialog("option", "width") - 25;
   var actual_height = $("#dv_visualization_dialog").closest('.ui-dialog').height();
   $("#dv_vis_full, #dv_vis_bottom_row").show();
 

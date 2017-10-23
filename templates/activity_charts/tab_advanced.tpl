@@ -1,26 +1,39 @@
-  <input type="hidden" id="vis_id" value="{$vis_id}" />
+<input type="hidden" id="vis_id" value="{$vis_id}" />
 
-  <div class="subtitle underline margin_top_large">{$L.phrase_pages_module|upper}</div>
+<div class="subtitle underline margin_top_large">{$L.phrase_pages_module|upper}</div>
 
-  {include file="messages.tpl"}
+{include file="messages.tpl"}
 
-  {if $pages_module_available}
+{if $pages_module_available}
     <div class="margin_bottom_large">
-      {$L.text_pages_module_intro}
+        {$L.text_pages_module_intro}
     </div>
 
-    <div class="grey_box margin_bottom_large">
-      <div class="margin_bottom bold">{$L.phrase_smarty_pages}</div>
-      <input type="text" style="width: 99%" class="medium_grey"
-        value="{literal}{{/literal}template_hook location=&quot;data_visualization&quot; vis_id={$vis_id} height=300 width=600{literal}}{/literal}" />
+    <div class="grey_box margin_bottom_large" id="smarty_editor_wrapper">
+        <div class="margin_bottom bold">{$L.phrase_smarty_pages}</div>
+        <input type="text" style="width: 99%" class="medium_grey" id="smarty_editor"
+            value="{literal}{{/literal}template_hook location=&quot;data_visualization&quot; vis_id={$vis_id} height=300 width=600{literal}}{/literal}" />
+
+        <script>
+          var smarty_editor = new CodeMirror.fromTextArea(document.getElementById("smarty_editor"), {literal}{{/literal}
+            mode: "smarty"
+          {literal}});{/literal}
+        </script>
     </div>
 
-    <div class="grey_box margin_bottom_large">
-      <div class="margin_bottom bold">{$L.phrase_php_pages}</div>
-      <textarea class="medium_grey" style="width:99%; height: 100px">ft_include_module("data_visualization");
+    <div class="grey_box margin_bottom_large" id="php_pages_editor_wrapper">
+        <div class="margin_bottom bold">{$L.phrase_php_pages}</div>
+        <textarea class="medium_grey" id="php_pages_editor" style="width:99%; height: 100px">use FormTools\Modules\DataVisualization\Visualizations;
+Modules::includeModule("data_visualization");
 $width  = 600;
 $height = 300;
-dv_display_visualization({$vis_id}, $width, $height);</textarea>
+Visualizations::displayVisualization({$vis_id}, $width, $height);</textarea>
+
+        <script>
+          var php_pages_editor = new CodeMirror.fromTextArea(document.getElementById("php_pages_editor"), {literal}{{/literal}
+            mode: "text/x-php"
+              {literal}});{/literal}
+        </script>
     </div>
 
     <div>
@@ -40,23 +53,35 @@ dv_display_visualization({$vis_id}, $width, $height);</textarea>
 
   <div class="subtitle underline margin_bottom_large margin_top_large">{$L.phrase_use_in_own_pages|upper}</div>
 
-  <div class="margin_bottom_large">
-    {$L.text_use_in_pages_desc}
-  </div>
+    <div class="margin_bottom_large">
+        {$L.text_use_in_pages_desc}
+    </div>
 
-  <textarea style="width:100%; height: 150px" class="medium_grey">&lt;?php
+    <div class="grey_box margin_bottom_large">
+        <textarea style="width:100%; height: 150px" id="own_pages_editor" class="medium_grey">&lt;?php
 require_once('{$g_root_dir}/global/library.php');
-ft_include_module("data_visualization");
+
+use FormTools\Modules;
+use FormTools\Modules\DataVisualization\Visualizations;
+
+Modules::includeModule("data_visualization");
 $width  = 600;
 $height = 300;
-dv_display_visualization({$vis_id}, $width, $height);
+Visualizations::displayVisualization({$vis_id}, $width, $height);
 ?></textarea>
+    </div>
 
-  <div class="clear"></div>
-  <p>
-    <input type="button" id="delete_visualization" value="{$L.phrase_delete_visualization}" class="burgundy right" />
-  </p>
-  <div class="clear"></div>
+    <script>
+      var own_pages_editor = new CodeMirror.fromTextArea(document.getElementById("own_pages_editor"), {literal}{{/literal}
+        mode: "php"
+      {literal}});{/literal}
+    </script>
+
+    <div class="clear"></div>
+    <p>
+        <input type="button" id="delete_visualization" value="{$L.phrase_delete_visualization}" class="burgundy right" />
+    </p>
+    <div class="clear"></div>
 
 
 <div id="add_to_menu_dialog" class="hidden">

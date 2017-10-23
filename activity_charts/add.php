@@ -18,13 +18,17 @@ $success = true;
 $message = "";
 if (isset($_POST["add"])) {
     list($success, $message, $vis_id) = ActivityCharts::addActivityChart($request, $L);
-    $form_id = $request["form_id"];
-    $view_id = isset($request["view_id"]) ? $request["view_id"] : "";
+    if ($success) {
+        header("location: edit.php?vis_id=$vis_id&page=main&is_new");
+        exit;
+    }
 }
 
 $js = General::getFormViewMappingJs();
 
 $page_vars = array(
+    "g_success" => $success,
+    "g_message" => $message,
     "vis_id" => $vis_id,
     "form_id" => $form_id,
     "view_id" => $view_id,

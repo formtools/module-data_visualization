@@ -98,7 +98,6 @@ class Module extends FormToolsModule
             return array(false, $L["notify_installation_problem_c"] . " <b>" . $e->getMessage() . "</b>");
         }
 
-        Hooks::registerHook("template", "data_visualization", "admin_submission_listings_top", "", "displayVisualizationIcon", 50, true);
         Hooks::registerHook("code", "data_visualization", "main", "FormTools\\Submissions::displaySubmissionListingQuicklinks", "addQuicklink", 50, true);
         Hooks::registerHook("template", "data_visualization", "head_bottom", "", "includeInHead", 50, true);
         Hooks::registerHook("code", "data_visualization", "start", "FormTools\\Forms::deleteForm", "deleteFormHook", 50, true);
@@ -112,6 +111,7 @@ class Module extends FormToolsModule
             "quicklinks_dialog_height"     => 400,
             "quicklinks_dialog_thumb_size" => 200,
             "default_cache_frequency"      => 30,
+            "hide_from_client_accounts"    => "no",
             "clients_may_refresh_cache"    => "yes",
 
             // Activity Chart default settings
@@ -233,9 +233,9 @@ END;
         $vis_messages = General::getVisMessages($L);
 
         echo <<< END
-<script src="https://www.google.com/jsapi"></script>
+<script src="https://www.gstatic.com/charts/loader.js"></script>
 <link type="text/css" rel="stylesheet" href="$root_url/modules/data_visualization/css/visualizations.css">
-<script src="$root_url/modules/data_visualization/scripts/visualizations.js?v=2"></script>
+<script src="$root_url/modules/data_visualization/scripts/visualizations.js"></script>
 <script>
 $(function() {
     $(".dv_vis_tile_enlarge").live("click", dv_ns.enlarge_visualization);
@@ -261,33 +261,6 @@ $vis_messages
     display: $cache_display;
 }
 </style>
-END;
-    }
-
-
-    public static function displayVisualizationIcon($template, $page_data)
-    {
-        $db = Core::$db;
-
-        // find out if there are any visualizations to be shown for this form
-        $db->query("
-            SELECT count(*)
-            FROM   {PREFIX}module_data_visualizations
-            WHERE  form_id = :form_id
-        ");
-        $db->bind("form_id", $page_data["form_id"]);
-        $db->execute();
-
-        if ($db->fetch(PDO::FETCH_COLUMN) == 0) {
-            return;
-        }
-
-        $root_url = Core::getRootUrl();
-
-        echo <<< END
-<div style="float: right; margin-top: -32px;">
-    <a href="#"><img src="$root_url/modules/data_visualization/images/icon_visualization_small.png" /></a>
-</div>
 END;
     }
 

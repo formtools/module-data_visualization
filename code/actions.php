@@ -16,20 +16,6 @@ $module = Modules::initModulePage("client");
 // multiple calls on same page to load content in unique areas)
 $action = $request["action"];
 
-// Find out if we need to return anything back with the response. This mechanism allows us to pass any information
-// between the Ajax submit function and the Ajax return function. Usage:
-//   "return_vals[]=question1:answer1&return_vals[]=question2:answer2&..."
-$return_val_str = "";
-if (isset($request["return_vals"])) {
-    $vals = array();
-    foreach ($request["return_vals"] as $pair) {
-        list($key, $value) = mb_split(":", $pair);
-        $vals[] = "$key: \"$value\"";
-    }
-    $return_val_str = ", " . join(", ", $vals);
-}
-
-
 switch ($action) {
     case "get_form_fields":
         $form_id = $request["form_id"];
@@ -38,7 +24,7 @@ switch ($action) {
         foreach ($form_fields as $field_info) {
             $js_info[] = array($field_info["field_id"], htmlspecialchars($field_info["field_title"], ENT_QUOTES));
         }
-        echo json_encode(array(
+        send_json(array(
             "success" => true,
             "form_id" => $form_id,
             "fields" => $js_info
@@ -62,7 +48,7 @@ switch ($action) {
     case "get_visualization":
         $vis_id = $request["vis_id"];
         $vis_data = Visualizations::getVisualizationForDisplay($vis_id);
-        echo json_encode($vis_data);
+        send_json($vis_data);
         break;
 
     case "get_activity_chart_data":
@@ -71,7 +57,7 @@ switch ($action) {
         $date_range = $request["date_range"];
         $submission_count_group = $request["submission_count_group"];
         $activity_info = ActivityCharts::getActivityInfo($form_id, $view_id, $date_range, $submission_count_group);
-        echo json_encode($activity_info);
+        send_json($activity_info);
         break;
 
     case "get_field_chart_data":
@@ -80,7 +66,7 @@ switch ($action) {
         $field_id = $request["field_id"];
         $ignore_empty_fields = $request["ignore_empty_fields"];
         $data = FieldCharts::getFieldChartInfo($form_id, $view_id, $field_id, $ignore_empty_fields);
-        echo json_encode($data);
+        send_json($data);
         break;
 
     case "get_menu":
@@ -103,14 +89,20 @@ switch ($action) {
 
     case "create_page_and_menu_item":
         $result = Visualizations::createPageAndMenuItem($request);
-        echo json_encode($result);
+        send_json($result);
         break;
 
     case "clear_visualization_cache":
         $vis_id = $request["vis_id"];
         Visualizations::clearVisualizationCache($vis_id);
         $vis_data = Visualizations::getVisualizationForDisplay($vis_id);
-        echo json_encode($vis_data);
+        send_json($vis_data);
         break;
 }
 
+
+function send_json($response)
+{
+    header("Content-Type: application/json");
+    echo json_encode($response);
+}

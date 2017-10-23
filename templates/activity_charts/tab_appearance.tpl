@@ -20,7 +20,7 @@
       </div>
     </div>
 
-    {include file="../../modules/data_visualization/no_internet_connection.tpl"}
+    {include file="../../no_internet_connection.tpl"}
 
     <table cellspacing="0" cellpadding="0" width="100%">
     <tr>

@@ -22,6 +22,7 @@ if (isset($request["update"])) {
         "quicklinks_dialog_height"     => $request["quicklinks_dialog_height"],
         "quicklinks_dialog_thumb_size" => $request["quicklinks_dialog_thumb_size"],
         "default_cache_frequency"      => $request["default_cache_frequency"],
+        "hide_from_client_accounts"    => $request["hide_from_client_accounts"],
         "clients_may_refresh_cache"    => $request["clients_may_refresh_cache"]
 	);
 	Modules::setModuleSettings($settings);

@@ -403,32 +403,31 @@ vis_ns.redraw_field_chart = function() {
     data.addRows(5);
   } else {
     json = vis_ns.cached_field_chart_data;
-    var data = new google.visualization.DataTable();
-    data.addColumn("string", "");
-    data.addColumn("number", "Count");
     if (json.data.length) {
       data.addRows(json.data.length);
-      console.log(json.data);
 
       for (var i=0, j=json.data.length; i<j; i++) {
-        data.setValue(i, 0, json.data[i].label.toString());
-        data.setValue(i, 1, json.data[i].data);
+        var label = (json.data[i].field_value === null) ? "" : json.data[i].field_value.toString();
+        data.setValue(i, 0, label);
+        data.setValue(i, 1, json.data[i].count);
       }
     }
   }
 
+  var thumb_chart_el = document.getElementById("thumb_chart");
+  var full_size_chart_el = document.getElementById("full_size_chart");
   switch (chart_type) {
     case "pie_chart":
-      var thumb_chart     = new google.visualization.PieChart(document.getElementById("thumb_chart"));
-      var full_size_chart = new google.visualization.PieChart(document.getElementById("full_size_chart"));
+      var thumb_chart     = new google.visualization.PieChart(thumb_chart_el);
+      var full_size_chart = new google.visualization.PieChart(full_size_chart_el);
       break;
     case "bar_chart":
-      var thumb_chart     = new google.visualization.BarChart(document.getElementById("thumb_chart"));
-      var full_size_chart = new google.visualization.BarChart(document.getElementById("full_size_chart"));
+      var thumb_chart     = new google.visualization.BarChart(thumb_chart_el);
+      var full_size_chart = new google.visualization.BarChart(full_size_chart_el);
       break;
     case "column_chart":
-      var thumb_chart     = new google.visualization.ColumnChart(document.getElementById("thumb_chart"));
-      var full_size_chart = new google.visualization.ColumnChart(document.getElementById("full_size_chart"));
+      var thumb_chart     = new google.visualization.ColumnChart(thumb_chart_el);
+      var full_size_chart = new google.visualization.ColumnChart(full_size_chart_el);
       break;
   }
 

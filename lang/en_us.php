@@ -162,6 +162,7 @@ $L["phrase_create_a_new_activity_chart"] = "Create a new Activity Chart";
 $L["phrase_not_cached"] = "Not cached";
 $L["phrase_please_select_view"] = "Please select a View";
 $L["phrase_edit_this_field_chart"] = "Edit this Field Chart";
+$L["phrase_hide_visualizations_from_client_accounts"] = "Hide visualizations from client accounts";
 
 $L["text_pages_module_intro"] = "This module is compatible with the Pages module. You can embed any visualization into a Page by copying and pasting the code below - or, just click the button below to automatically create and configure a new page containing this visualization.";
 $L["text_no_visualizations"] = "There are no visualizations set up yet. Click the button below to get started!";
@@ -170,11 +171,11 @@ $L["text_no_visualization_found_in_search"] = "Sorry, no visualizations were fou
 $L["text_activity_chart_desc"] = "<b>Activity Charts</b> graph the activity on your forms. You can choose from Line, Area or Column Charts.";
 $L["text_field_chart_desc"] = "<b>Field Charts</b> graph the distribution of content within a single form field. You can choose from Pie, Bar or Column Charts.";
 $L["text_activity_chart_intro"] = "Activity Charts display the frequency of submissions to your forms in a line or area graph. They are automatically displayed in the Visualization dialog window on the Submission Listing pages according to the settings below.";
-$L["text_cache_frequency_explanation"] = "Calculating all the statistics to create the chart can take a long time, so the Data Visualization module uses a cache to store all data for faster retrieval. This setting lets you control how often the data for this visualization cache should be updated.";
+$L["text_cache_frequency_explanation"] = "Processing the data to create the chart can take a long time, so the Data Visualization module uses a cache to store all data for faster load times. This setting lets you control how often the data for this visualization cache should be updated.";
 $L["text_examples_contain_dud_data"] = "The example visualizations below contain dud data, just so you can see what they will look like.";
 $L["text_line_area_only"] = "For Line and Area charts only.";
 $L["text_use_in_pages_desc"] = "You can display this visualization in your own website pages by using the following PHP code.";
-$L["text_create_page_desc"] = "This is a simple time-saving feature. It does all the nitty-gritty work of creating a new page in the Pages module, adding in the visualization code and assigning it to a menu. You can do all of this manually, but this is quicker! All pages created here may be later edited or removed via the Pages module.";
+$L["text_create_page_desc"] = "This creates a new page via the Pages module and adds them to a menu. They can be removed later via the Pages module / Menus section.";
 $L["text_default_field_chart_settings_page"] = "This page lets you choose the default display settings for your Field Charts. Field Charts graph the content of a single one of your form fields to show how the contents are distributed. All of these settings may be optionally overridden for any Field Chart.";
 $L["text_default_activity_chart_settings_page"] = "Activity Charts display the frequency of your form submissions in Line, Area or Column Charts. This page lets you choose the default settings for this type of visualization. To create an Activity Chart for one of your forms, return to the main <a href=\"../\">Data Visualizations</a> page and click the Create New Visualization button.";
 $L["text_add_visualization"] = "Use the form below to construct your visualization. After it has been created, you can edit it for additional settings, and to find out how to embed the visualization in your own pages and in pages created by the Pages module.";

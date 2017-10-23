@@ -61,6 +61,7 @@ class FieldCharts
                 "include_legend_quicklinks" => $include_legend_quicklinks,
                 "include_legend_full_size" => $include_legend_full_size
             ));
+            $db->execute();
         } catch (PDOException $e) {
             return array(false, $L["notify_error_creating_field_chart"], "");
         }
@@ -141,7 +142,7 @@ class FieldCharts
 
         if ($ignore_empty_fields == "yes") {
             $db->query("
-                SELECT $col_name as field_value, count(*) as data
+                SELECT $col_name as field_value, count(*) as count
                 FROM   {PREFIX}form_{$form_id}
                 WHERE  $col_name IS NOT NULL AND TRIM($col_name) != ''
                        $filter_where_clause
@@ -149,17 +150,19 @@ class FieldCharts
             ");
         } else {
             $db->query("
-                SELECT CASE
+                SELECT
+                  CASE
                     WHEN $col_name IS NULL OR $col_name = ''
-                      THEN NULL
+                    THEN NULL
                     ELSE $col_name
-                      END as field_value, count(*) as data
+                  END as field_value, count(*) as count
                   FROM {PREFIX}form_{$form_id}
-                WHERE 1 = 1
-                $filter_where_clause
-                GROUP BY field_value
+                  WHERE 1 = 1
+                        $filter_where_clause
+                  GROUP BY field_value
             ");
         }
+
         $db->execute();
         $results = $db->fetchAll();
 
@@ -361,6 +364,9 @@ class FieldCharts
             "access_views" => $access_views,
             "vis_id" => $vis_id
         ));
+
         $db->execute();
+
+        return array(true, "");
     }
 }
