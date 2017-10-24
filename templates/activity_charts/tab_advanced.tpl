@@ -23,11 +23,10 @@
 
     <div class="grey_box margin_bottom_large" id="php_pages_editor_wrapper">
         <div class="margin_bottom bold">{$L.phrase_php_pages}</div>
-        <textarea class="medium_grey" id="php_pages_editor" style="width:99%; height: 100px">use FormTools\Modules\DataVisualization\Visualizations;
-Modules::includeModule("data_visualization");
+        <textarea class="medium_grey" id="php_pages_editor" style="width:99%; height: 100px">FormTools\Modules::includeModule("data_visualization");
 $width  = 600;
 $height = 300;
-Visualizations::displayVisualization({$vis_id}, $width, $height);</textarea>
+FormTools\Modules\DataVisualization\Visualizations::displayVisualization({$vis_id}, $width, $height);</textarea>
 
         <script>
           var php_pages_editor = new CodeMirror.fromTextArea(document.getElementById("php_pages_editor"), {literal}{{/literal}
@@ -60,14 +59,10 @@ Visualizations::displayVisualization({$vis_id}, $width, $height);</textarea>
     <div class="grey_box margin_bottom_large">
         <textarea style="width:100%; height: 150px" id="own_pages_editor" class="medium_grey">&lt;?php
 require_once('{$g_root_dir}/global/library.php');
-
-use FormTools\Modules;
-use FormTools\Modules\DataVisualization\Visualizations;
-
-Modules::includeModule("data_visualization");
+FormTools\Modules::includeModule("data_visualization");
 $width  = 600;
 $height = 300;
-Visualizations::displayVisualization({$vis_id}, $width, $height);
+FormTools\Modules\DataVisualization\Visualizations::displayVisualization({$vis_id}, $width, $height);
 ?></textarea>
     </div>
 

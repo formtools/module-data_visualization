@@ -264,4 +264,72 @@ $vis_messages
 END;
     }
 
+
+    public function displayInPagesModule($location, $params)
+    {
+        $attributes = $params["form_tools_all_template_hook_params"];
+
+        if (!isset($attributes["vis_id"]) || empty($attributes["vis_id"])) {
+            echo "[Data Visualization hook error: <b>No vis_id attribute</b>]";
+            return;
+        }
+        if (!isset($attributes["height"]) || empty($attributes["height"])) {
+            echo "[Data Visualization hook error: <b>No height attribute</b>]";
+            return;
+        }
+        if (!isset($attributes["width"]) || empty($attributes["width"])) {
+            echo "[Data Visualization hook error: <b>No width attribute</b>]";
+            return;
+        }
+
+        $vis_id = $attributes["vis_id"];
+        $height = $attributes["height"];
+        $width = $attributes["width"];
+
+        /*
+         Settings that may be overridden:
+
+           Activity Charts:
+           - title (vis_name)
+           - colour ("red", "orange", "yellow", "green", "blue", "indigo", "violet", "black", "gray"
+           - line_width (number 0-10)
+
+           Field Charts:
+
+           (pie chart)
+           - title (vis_name)
+           - pie_chart_format ("3D" / "2D")
+           - include_legend ("yes" / "no")
+
+           (other)
+           - title (vis_name)
+           - colour ("red", "orange", "yellow", "green", "blue", "indigo", "violet", "black", "gray"
+        */
+
+        $overridden_settings = array();
+        if (isset($attributes["title"])) {
+            $overridden_settings["title"] = $attributes["title"];
+        }
+        if (isset($attributes["line_width"])) {
+            $overridden_settings["line_width"] = $attributes["line_width"];
+        }
+        if (isset($attributes["pie_chart_format"])) {
+            $overridden_settings["pie_chart_format"] = $attributes["pie_chart_format"];
+        }
+        if (isset($attributes["include_legend"])) {
+            $overridden_settings["include_legend"] = $attributes["include_legend"];
+        }
+
+        // allow both US + Canadian/UK spelling
+        if (isset($attributes["colour"])) {
+            $overridden_settings["colour"] = $attributes["colour"];
+        } else {
+            if (isset($attributes["color"])) {
+                $overridden_settings["colour"] = $attributes["color"];
+            }
+        }
+
+        Visualizations::displayVisualization($vis_id, $width, $height, $overridden_settings);
+    }
+
 }

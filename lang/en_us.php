@@ -213,7 +213,7 @@ $L["notify_pages_module_not_installed"] = "The Pages module is not installed or 
 $L["notify_page_created_and_assigned"] = "The page has been created and assigned to your menu.";
 $L["notify_visualization_cache_cleared"] = "The visualization cache has been cleared.";
 $L["notify_specific_visualization_cache_cleared"] = "The cache for this visualization has been cleared.";
-$L["notify_no_internet_connection"] = "Sorry, we cannot load the Google Charts library, which is needed in order for this module to work properly. This is most likely caused by there being no internet connection available.";
+$L["notify_no_internet_connection"] = "Sorry, we cannot load the Google Charts library. This is most likely caused by there being no internet connection available.";
 
 $L["confirm_delete_visualization"] = "Are you sure you want to delete this visualization?";
 

@@ -324,75 +324,6 @@ class Visualizations
     }
 
 
-    function dv_display_in_pages_module($location, $params)
-    {
-        $attributes = $params["form_tools_all_template_hook_params"];
-
-        if (!isset($attributes["vis_id"]) || empty($attributes["vis_id"])) {
-            echo "[Data Visualization hook error: <b>No vis_id attribute</b>]";
-            return;
-        }
-        if (!isset($attributes["height"]) || empty($attributes["height"])) {
-            echo "[Data Visualization hook error: <b>No height attribute</b>]";
-            return;
-        }
-        if (!isset($attributes["width"]) || empty($attributes["width"])) {
-            echo "[Data Visualization hook error: <b>No width attribute</b>]";
-            return;
-        }
-
-        $attributes = ft_sanitize($attributes);
-        $vis_id = $attributes["vis_id"];
-        $height = $attributes["height"];
-        $width = $attributes["width"];
-
-        /*
-         Settings that may be overridden:
-
-           Activity Charts:
-           - title (vis_name)
-           - colour ("red", "orange", "yellow", "green", "blue", "indigo", "violet", "black", "gray"
-           - line_width (number 0-10)
-
-           Field Charts:
-
-           (pie chart)
-           - title (vis_name)
-           - pie_chart_format ("3D" / "2D")
-           - include_legend ("yes" / "no")
-
-           (other)
-           - title (vis_name)
-           - colour ("red", "orange", "yellow", "green", "blue", "indigo", "violet", "black", "gray"
-        */
-
-        $overridden_settings = array();
-        if (isset($attributes["title"])) {
-            $overridden_settings["title"] = $attributes["title"];
-        }
-        if (isset($attributes["line_width"])) {
-            $overridden_settings["line_width"] = $attributes["line_width"];
-        }
-        if (isset($attributes["pie_chart_format"])) {
-            $overridden_settings["pie_chart_format"] = $attributes["pie_chart_format"];
-        }
-        if (isset($attributes["include_legend"])) {
-            $overridden_settings["include_legend"] = $attributes["include_legend"];
-        }
-
-        // allow both US + Canadian/UK spelling
-        if (isset($attributes["colour"])) {
-            $overridden_settings["colour"] = $attributes["colour"];
-        } else {
-            if (isset($attributes["color"])) {
-                $overridden_settings["colour"] = $attributes["color"];
-            }
-        }
-
-        self::displayVisualization($vis_id, $width, $height, $overridden_settings);
-    }
-
-
     public static function displayVisualization($vis_id, $width, $height, $overridden_settings = array())
     {
         global $g_cache;
@@ -405,7 +336,7 @@ class Visualizations
 
         $id_suffix = $g_cache["data_visualization_{$vis_id}_count"];
 
-        $vis_info = dv_get_visualization_for_display($vis_id);
+        $vis_info = self::getVisualizationForDisplay($vis_id);
         $vis_type = $vis_info["vis_type"];
         $chart_type = $vis_info["chart_type"];
 
@@ -414,7 +345,7 @@ class Visualizations
             $title = $overridden_settings["title"];
         }
 
-        $title = ft_sanitize($title);
+        $title = addcslashes($title, "'");
 
         $num_rows = count($vis_info["data"]);
 
@@ -544,18 +475,18 @@ END;
         $js_lines_str = implode("\n", $js_lines);
 
         echo <<< END
-<script src="https://www.google.com/jsapi"></script>
+<script src="https://www.gstatic.com/charts/loader.js"></script>
 <div id="dv_vis_{$vis_id}_{$id_suffix}"></div>
 <script>
-google.load("visualization", "1", {packages:["corechart"]});
-google.setOnLoadCallback(vis_drawChart);
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(vis_drawChart);
 function vis_drawChart() {
-  var data = new google.visualization.DataTable();
-  data.addColumn("string", "");
-  data.addColumn("number", "Submissions");
-  data.addRows($num_rows);
-  $js_lines_str
-  chart.draw(data, settings);
+    var data = new google.visualization.DataTable();
+    data.addColumn("string", "");
+    data.addColumn("number", "Submissions");
+    data.addRows($num_rows);
+    $js_lines_str
+    chart.draw(data, settings);
 }
 </script>
 END;
@@ -661,11 +592,11 @@ END;
         $menu_position = $request["menu_position"];
         $is_submenu = $request["is_submenu"];
 
-        $pages_module = Modules::installModule("pages");
+        $pages_module = Modules::getModuleInstance("pages");
 
         $content =<<< END
 <div style="border:1px solid #cccccc">
-    {template_hook location=\"data_visualization\" vis_id=$vis_id height=400 width=738}
+    {template_hook location="data_visualization" vis_id=$vis_id height=400 width=738}
 </div>
 END;
 
@@ -700,7 +631,7 @@ END;
             } else {
                 $db->query("
                     UPDATE {PREFIX}menu_items
-                    SET    list_order = list_order+1
+                    SET    list_order = list_order + 1
                     WHERE  menu_id = :menu_id AND
                            list_order > :list_order
                 ");
