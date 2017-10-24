@@ -99,7 +99,7 @@ dv_ns.show_visualizations_dialog = function() {
   });
 
   return false;
-}
+};
 
 
 /**
@@ -204,10 +204,8 @@ dv_ns.get_visualization_response = function(json) {
 
 
 dv_ns.draw_activity_chart = function(json, show_title, target_el, width, height) {
-  var vis_id     = json.vis_id;
   var vis_colour = json.vis_colour;
   var line_width = json.line_width;
-  var chart_type = json.chart_type;
 
   var data = new google.visualization.DataTable();
   data.addColumn("string", "");
@@ -220,7 +218,8 @@ dv_ns.draw_activity_chart = function(json, show_title, target_el, width, height)
 
   data.addRows(num_rows);
   for (var i=0, j=num_rows; i<j; i++) {
-    data.setValue(i, 0, json.data[i].label.toString());
+    var label = (json.data[i].label === null) ? "" : json.data[i].label.toString();
+    data.setValue(i, 0, label);
     data.setValue(i, 1, json.data[i].data);
   }
 

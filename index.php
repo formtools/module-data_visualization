@@ -82,9 +82,6 @@ $page_vars = array(
     "chart_type" => $chart_type,
     "account_type" => $account_type,
     "client_id" => $client_id,
-    "js_files" => array(
-        "scripts/visualizations.js"
-    ),
     "js_messages" => array(
         "word_delete", "word_edit", "phrase_please_select_form", "phrase_please_select", "word_yes", "word_no"
     ),
@@ -165,6 +162,10 @@ $vis_messages
 
 g.vis_ids = [$vis_id_str];
 $js
+END;
+
+$page_vars["head_string"] =<<< END
+<script src="scripts/visualizations.js"></script>
 END;
 
 
