@@ -1,4 +1,4 @@
-## module-data_visualization
+## Data Visualization module
 
 ### Introduction
 
@@ -10,9 +10,9 @@ This module provides a simple interface to create and manage your visualizations
 
 ### Documentation
 
-[http://modules.formtools.org/data_visualization/](http://modules.formtools.org/data_visualization/)
+[https://docs.formtools.org/modules/data_visualization/](https://docs.formtools.org/modules/data_visualization/)
 
 ### Form Tools Extensions
 
-For further information about Form Tools extensions, check out the following link:
-[http://www.formtools.org/extensions.php](http://www.formtools.org/extensions.php)
+For further information about Form Tools modules, check out:
+[https://modules.formtools.org](https://modules.formtools.org)
