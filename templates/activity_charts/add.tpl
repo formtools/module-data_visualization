@@ -1,4 +1,4 @@
-{include file='modules_header.tpl'}
+{ft_include file='modules_header.tpl'}
 
     <table cellpadding="0" cellspacing="0">
     <tr>
@@ -15,7 +15,7 @@
 
     {if $g_message}
 
-        {include file="messages.tpl"}
+        {ft_include file="messages.tpl"}
 
         <div><b>{$L.word_actions}</b></div>
         <ul>
@@ -31,7 +31,7 @@
 
     {else}
 
-        {include file="messages.tpl"}
+        {ft_include file="messages.tpl"}
         {include file="../../no_internet_connection.tpl"}
 
         <div class="margin_bottom_large">
@@ -123,4 +123,4 @@
 
     {/if}
 
-{include file='modules_footer.tpl'}
+{ft_include file='modules_footer.tpl'}

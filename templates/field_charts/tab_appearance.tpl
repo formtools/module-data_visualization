@@ -1,4 +1,4 @@
-  {include file="messages.tpl"}
+  {ft_include file="messages.tpl"}
 
   <form action="{$same_page}" method="post">
     <input type="hidden" name="vis_id" id="vis_id" value="{$vis_info.vis_id}" />

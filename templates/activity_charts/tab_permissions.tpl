@@ -1,6 +1,6 @@
   <div class="subtitle underline margin_top_large">{$LANG.word_permissions|upper}</div>
 
-  {include file='messages.tpl'}
+  {ft_include file='messages.tpl'}
 
   <form action="{$same_page}" method="post">
     <input type="hidden" name="vis_id" value="{$vis_id}" />

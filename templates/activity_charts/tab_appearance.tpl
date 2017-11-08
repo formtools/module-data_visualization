@@ -1,4 +1,4 @@
-  {include file="messages.tpl"}
+  {ft_include file="messages.tpl"}
 
   <form action="{$same_page}" method="post">
     <input type="hidden" id="page_type" value="edit" />

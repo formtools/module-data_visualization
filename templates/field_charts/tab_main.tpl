@@ -4,7 +4,7 @@
 
     <div class="subtitle underline margin_top_large">{$LANG.phrase_main_settings|upper}</div>
 
-    {include file="messages.tpl"}
+    {ft_include file="messages.tpl"}
 
     <table cellspacing="1" cellpadding="0" class="list_table">
     <tr>

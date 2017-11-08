@@ -1,4 +1,4 @@
-{include file='modules_header.tpl'}
+{ft_include file='modules_header.tpl'}
 
   <table cellpadding="0" cellspacing="0" class="margin_bottom_large">
   <tr>
@@ -29,4 +29,4 @@
 
   {ft_include file='tabset_close.tpl'}
 
-{include file='modules_footer.tpl'}
+{ft_include file='modules_footer.tpl'}

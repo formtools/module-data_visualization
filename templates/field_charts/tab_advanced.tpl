@@ -2,7 +2,7 @@
 
     <div class="subtitle underline margin_top_large">{$L.phrase_pages_module|upper}</div>
 
-    {include file="messages.tpl"}
+    {ft_include file="messages.tpl"}
 
     {if $pages_module_available}
         <div class="margin_bottom_large">
