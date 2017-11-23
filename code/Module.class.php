@@ -7,7 +7,7 @@ use FormTools\Core;
 use FormTools\Hooks;
 use FormTools\Settings;
 use FormTools\Module as FormToolsModule;
-use PDO, PDOException;
+use Exception;
 
 
 class Module extends FormToolsModule
@@ -17,8 +17,8 @@ class Module extends FormToolsModule
     protected $author = "Ben Keen";
     protected $authorEmail = "ben.keen@gmail.com";
     protected $authorLink = "http://formtools.org";
-    protected $version = "2.0.2";
-    protected $date = "2017-11-07";
+    protected $version = "2.0.3";
+    protected $date = "2017-11-22";
     protected $originLanguage = "en_us";
     protected $jsFiles = array(
         "https://www.gstatic.com/charts/loader.js",
@@ -92,7 +92,7 @@ class Module extends FormToolsModule
                 $db->execute();
             }
             $db->processTransaction();
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             $db->rollbackTransaction();
             $L = $this->getLangStrings();
             return array(false, $L["notify_installation_problem_c"] . " <b>" . $e->getMessage() . "</b>");

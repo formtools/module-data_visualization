@@ -6,7 +6,7 @@ use FormTools\Core;
 use FormTools\Forms;
 use FormTools\General as CoreGeneral;
 use FormTools\Views;
-use PDO, PDOException;
+use PDO, Exception;
 
 
 class General
@@ -200,7 +200,7 @@ END;
                 "data" => $data
             ));
             $db->execute();
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             // TODO
         }
     }

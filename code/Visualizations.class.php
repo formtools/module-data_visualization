@@ -5,7 +5,7 @@ namespace FormTools\Modules\DataVisualization;
 use FormTools\Core;
 use FormTools\Menus;
 use FormTools\Modules;
-use PDO, PDOException;
+use PDO, Exception;
 
 class Visualizations
 {
@@ -35,7 +35,7 @@ class Visualizations
             ));
             $db->execute();
 
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             return array(true, $L["notify_visualization_not_added"]);
         }
 

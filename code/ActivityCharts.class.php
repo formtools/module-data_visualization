@@ -7,7 +7,7 @@ use FormTools\Core;
 use FormTools\General as CoreGeneral;
 use FormTools\Modules;
 use FormTools\ViewFilters;
-use PDO, PDOException;
+use PDO, Exception;
 
 
 class ActivityCharts
@@ -66,7 +66,7 @@ class ActivityCharts
                 "line_width" => $line_width
             ));
             $db->execute();
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             return array(false, $L["notify_error_creating_activity_chart"] . $e->getMessage(), "");
         }
 
@@ -93,7 +93,7 @@ class ActivityCharts
 
             // always clear the cache
             Visualizations::clearVisualizationCache($vis_id);
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             return array(false, $L["notify_error_updating_activity_chart"], "");
         }
 
@@ -293,7 +293,6 @@ class ActivityCharts
             // if no date range clause was specified, the user wants to return everything. In which case, the start date
             // is dependant on what's stored in the database. [The end date is ALWAYS today - regardless of how messed up the
             // submission data info actually is]
-            $first_day = "";
             if (empty($date_range_clause))  {
                 $where_clause = "";
                 if (!empty($filter_sql_clause)) {

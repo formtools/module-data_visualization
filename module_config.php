@@ -220,7 +220,7 @@ $FILES = array(
     "activity_charts/page_permissions.php",
     "activity_charts/settings.php",
     "code/ActivityCharts.class.php",
-    "code/FIeldCharts.class.php",
+    "code/FieldCharts.class.php",
     "code/General.class.php",
     "code/Module.class.php",
     "code/Visualizations.class.php",

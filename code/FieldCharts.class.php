@@ -10,7 +10,7 @@ use FormTools\General as CoreGeneral;
 use FormTools\OptionLists;
 use FormTools\Modules;
 use FormTools\ViewFilters;
-use PDOException;
+use Exception;
 
 
 class FieldCharts
@@ -62,7 +62,7 @@ class FieldCharts
                 "include_legend_full_size" => $include_legend_full_size
             ));
             $db->execute();
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             return array(false, $L["notify_error_creating_field_chart"], "");
         }
 
@@ -268,7 +268,7 @@ class FieldCharts
                 "vis_id" => $vis_id
             ));
             $db->execute();
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             return array(false, $e->getMessage());
         }
 
@@ -313,7 +313,7 @@ class FieldCharts
                 "vis_id" => $vis_id
             ));
             $db->execute();
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             return array(false, $e->getMessage());
         }
 
