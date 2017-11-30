@@ -43,8 +43,8 @@ $links = Visualizations::getTabsetLinks($vis_id);
 
 // start compiling the page vars here (save duplicate code!)
 $page_vars = array(
-    "success" => $success,
-    "message" => $message,
+    "g_success" => $success,
+    "g_message" => $message,
     "page" => $page,
     "tabs" => $tabs,
     "show_tabset_nav_links" => true,

@@ -520,7 +520,10 @@ END;
 
         $results = self::searchVisualizations($search_criteria);
 
-        $return_info = array("prev_link" => "", "next_link" => "");
+        $return_info = array(
+            "prev_link" => "",
+            "next_link" => ""
+        );
 
         // it's possible that there are NO visualization IDs: the user may have done a search that returns no results
         // but be editing a visualization on a different tab
@@ -536,8 +539,13 @@ END;
         }
         $current_index = array_search($vis_id, $sorted_vis_ids);
 
+        if (!$current_index) {
+            return $return_info;
+        }
+
+        $num_results = count($sorted_vis_ids);
         if ($current_index === 0) {
-            if (count($sorted_vis_ids) > 1) {
+            if ($num_results > 1) {
                 $next_vis_id = $sorted_vis_ids[$current_index + 1];
                 if ($vis_id_to_types[$next_vis_id] == "activity") {
                     $return_info["next_link"] = "../activity_charts/edit.php?vis_id=$next_vis_id";
@@ -546,8 +554,8 @@ END;
                 }
             }
         } else {
-            if ($current_index === count($sorted_vis_ids) - 1) {
-                if (count($sorted_vis_ids) > 1) {
+            if ($current_index === $num_results - 1) {
+                if ($num_results > 1) {
                     $prev_vis_id = $sorted_vis_ids[$current_index - 1];
                     if ($vis_id_to_types[$prev_vis_id] == "activity") {
                         $return_info["prev_link"] = "../activity_charts/edit.php?vis_id=$prev_vis_id";

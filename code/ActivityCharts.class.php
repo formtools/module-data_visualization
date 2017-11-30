@@ -492,7 +492,7 @@ class ActivityCharts
             SET    vis_name = :vis_name,
                    form_id = :form_id,
                    cache_update_frequency = :cache_update_frequency
-            WHERE  vis_id = $vis_id
+            WHERE  vis_id = :vis_id
         ");
         $db->bindAll(array(
             "vis_name" => $info["vis_name"],
@@ -506,6 +506,8 @@ class ActivityCharts
 
     private static function updateVisualizationAppearanceTab($vis_id, $info)
     {
+        $db = Core::$db;
+
         $db->query("
             UPDATE {PREFIX}module_data_visualizations
             SET    chart_type = :chart_type,
@@ -546,8 +548,8 @@ class ActivityCharts
                 VALUES ($vis_id, $account_id)
             ");
             $db->bindAll(array(
-            "vis_id" => $vis_id,
-            "account_id" => $account_id
+                "vis_id" => $vis_id,
+                "account_id" => $account_id
             ));
             $db->execute();
         }
@@ -572,5 +574,6 @@ class ActivityCharts
             "access_views" => $access_views,
             "vis_id" => $vis_id
         ));
+        $db->execute();
     }
 }

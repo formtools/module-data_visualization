@@ -16,9 +16,9 @@ class Module extends FormToolsModule
     protected $moduleDesc = "This module utilizes Google Charts API to create custom graphs and charts of your form submission data, providing an alternative, visual interpretation of your data.";
     protected $author = "Ben Keen";
     protected $authorEmail = "ben.keen@gmail.com";
-    protected $authorLink = "http://formtools.org";
-    protected $version = "2.0.3";
-    protected $date = "2017-11-22";
+    protected $authorLink = "https://formtools.org";
+    protected $version = "2.0.4";
+    protected $date = "2017-11-29";
     protected $originLanguage = "en_us";
     protected $jsFiles = array(
         "https://www.gstatic.com/charts/loader.js",

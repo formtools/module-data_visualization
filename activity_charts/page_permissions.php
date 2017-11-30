@@ -9,8 +9,12 @@ $page_vars["vis_id"] = $vis_id;
 $page_vars["vis_info"] = $vis_info;
 $page_vars["views"] = $views;
 $page_vars["access_views"] = $access_views;
-$page_vars["js_messages"] = array("phrase_please_select", "phrase_please_select_form", "word_edit", "word_delete", "word_yes", "word_no");
-$page_vars["module_js_messages"] = array("phrase_delete_visualization", "confirm_delete_visualization");
+$page_vars["js_messages"] = array(
+    "phrase_please_select", "phrase_please_select_form", "word_edit", "word_delete", "word_yes", "word_no"
+);
+$page_vars["module_js_messages"] = array(
+    "phrase_delete_visualization", "confirm_delete_visualization"
+);
 
 $page_vars["head_js"] =<<< END
 $(function() {

@@ -35,8 +35,8 @@ if (isset($_POST["update"])) {
 }
 
 $page_vars = array(
-    "success" => $success,
-    "message" => $message,
+    "g_success" => $success,
+    "g_message" => $message,
     "module_settings" => $module->getSettings()
 );
 
