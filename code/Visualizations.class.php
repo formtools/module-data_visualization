@@ -320,7 +320,7 @@ class Visualizations
         $db->bind("vis_id", $vis_id);
         $db->execute();
 
-        return $db->fetch(PDO::FETCH_COLUMN);
+        return $db->fetchAll(PDO::FETCH_COLUMN);
     }
 
 
