@@ -98,12 +98,7 @@ class Module extends FormToolsModule
             return array(false, $L["notify_installation_problem_c"] . " <b>" . $e->getMessage() . "</b>");
         }
 
-        Hooks::registerHook("code", "data_visualization", "main", "FormTools\\Submissions::displaySubmissionListingQuicklinks", "addQuicklink", 50, true);
-        Hooks::registerHook("template", "data_visualization", "head_bottom", "", "includeInHead", 50, true);
-        Hooks::registerHook("code", "data_visualization", "start", "FormTools\\Forms::deleteForm", "deleteFormHook", 50, true);
-
-        // a custom hook for use in Smarty pages generated via the Pages module
-        Hooks::registerHook("template", "data_visualization", "data_visualization", "", "displayInPagesModule", 50, true);
+        $this->resetHooks();
 
         $settings = array(
             // main settings
@@ -150,6 +145,26 @@ class Module extends FormToolsModule
 
         return array(true, "");
     }
+
+
+    public function upgrade($module_id, $old_module_version)
+    {
+        $this->resetHooks();
+    }
+
+
+    public function resetHooks()
+    {
+        Hooks::unregisterModuleHooks("data_visualization");
+
+        Hooks::registerHook("code", "data_visualization", "main", "FormTools\\Submissions::displaySubmissionListingQuicklinks", "addQuicklink", 50, true);
+        Hooks::registerHook("template", "data_visualization", "head_bottom", "", "includeInHead", 50, true);
+        Hooks::registerHook("code", "data_visualization", "start", "FormTools\\Forms::deleteForm", "deleteFormHook", 50, true);
+
+        // a custom hook for use in Smarty pages generated via the Pages module
+        Hooks::registerHook("template", "data_visualization", "data_visualization", "", "displayInPagesModule", 50, true);
+    }
+
 
     /**
      * This adds the quicklink icon to the Submission Listing page. This function is already assigned to those
