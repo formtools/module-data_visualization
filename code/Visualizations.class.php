@@ -346,13 +346,17 @@ class Visualizations
         }
 
         $title = addcslashes($title, "'");
-
         $num_rows = count($vis_info["data"]);
 
         $js_lines = array();
-        for ($i = 0; $i < count($vis_info["data"]); $i++) {
-            $label = addslashes($vis_info["data"][$i]["label"]);
-            $data = $vis_info["data"][$i]["data"];
+        for ($i = 0; $i<$num_rows; $i++) {
+            if ($vis_type === "field") {
+                $label = addslashes($vis_info["data"][$i]["field_value"]);
+                $data = $vis_info["data"][$i]["count"];
+            } else {
+                $label = addslashes($vis_info["data"][$i]["label"]);
+                $data = $vis_info["data"][$i]["data"];
+            }
             $js_lines[] = "data.setValue($i, 0, \"$label\");";
             $js_lines[] = "data.setValue($i, 1, $data);";
         }

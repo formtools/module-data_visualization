@@ -17,8 +17,8 @@ class Module extends FormToolsModule
     protected $author = "Ben Keen";
     protected $authorEmail = "ben.keen@gmail.com";
     protected $authorLink = "https://formtools.org";
-    protected $version = "2.0.4";
-    protected $date = "2017-11-29";
+    protected $version = "2.0.5";
+    protected $date = "2018-01-24";
     protected $originLanguage = "en_us";
     protected $jsFiles = array(
         "https://www.gstatic.com/charts/loader.js",
