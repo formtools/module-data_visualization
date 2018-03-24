@@ -172,38 +172,11 @@ class FieldCharts
         $form_field = Fields::getFormField($field_id, array("include_field_settings" => true));
         $field_type_info = FieldTypes::getFieldType($form_field["field_type_id"]);
 
-        if (!empty($field_type_info["raw_field_type_map_multi_select_id"])) {
-            $option_list_setting_id = $field_type_info["raw_field_type_map_multi_select_id"];
-            $option_list_id = (isset($form_field["settings"][$option_list_setting_id])) ? $form_field["settings"][$option_list_setting_id] : "";
-
-            if (!empty($option_list_id)) {
-                $option_list = OptionLists::getOptionListOptions($option_list_id);
-                $map = array();
-                foreach ($option_list as $grouped) {
-                    if (!is_array($grouped["options"])) {
-                        continue;
-                    }
-
-                    foreach ($grouped["options"] as $option) {
-                        $map[$option["option_value"]] = $option["option_name"];
-                    }
-                }
-
-                $updated_results = array();
-                while (list($val, $name) = each($map)) {
-                    foreach ($results as $result) {
-                        if ($val == $result["label"]) {
-                            $updated_results[] = array(
-                                "label" => $map[$result["label"]],
-                                "data" => $result["data"]
-                            );
-                            break;
-                        }
-                    }
-                }
-
-                $results = $updated_results;
-            }
+        // radios, checkboxes, select + multi-select are handled separately: we need to look at the option list & get the
+        // display values
+        $raw_field_type_map_multi_select_id = $field_type_info["raw_field_type_map_multi_select_id"];
+        if (!empty($raw_field_type_map_multi_select_id) && isset($form_field["settings"][$raw_field_type_map_multi_select_id])) {
+            $results = self::parseMultiSelectData($form_field["settings"][$raw_field_type_map_multi_select_id], $results);
         }
 
         $now = CoreGeneral::getCurrentDatetime();
@@ -368,5 +341,39 @@ class FieldCharts
         $db->execute();
 
         return array(true, "");
+    }
+
+
+    private static function parseMultiSelectData($option_list_id, $results)
+    {
+        if (!empty($option_list_id)) {
+            $option_list = OptionLists::getOptionListOptions($option_list_id);
+
+            $option_list_map = array();
+            foreach ($option_list as $grouped) {
+                if (!is_array($grouped["options"])) {
+                    continue;
+                }
+                foreach ($grouped["options"] as $option) {
+                    $option_list_map[$option["option_value"]] = $option["option_name"];
+                }
+            }
+
+            $updated_results = array();
+            foreach ($results as $result) {
+                if (!array_key_exists($result["field_value"], $option_list_map)) {
+                    continue;
+                }
+
+                $updated_results[] = array(
+                    "field_value" => $option_list_map[$result["field_value"]],
+                    "count" => $result["count"]
+                );
+            }
+
+            $results = $updated_results;
+        }
+
+        return $results;
     }
 }

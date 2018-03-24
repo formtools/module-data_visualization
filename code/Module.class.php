@@ -13,12 +13,12 @@ use Exception;
 class Module extends FormToolsModule
 {
     protected $moduleName = "Data Visualization";
-    protected $moduleDesc = "This module utilizes Google Charts API to create custom graphs and charts of your form submission data, providing an alternative, visual interpretation of your data.";
+    protected $moduleDesc = "This module uses Google Charts API to create custom graphs and charts of your form submission data.";
     protected $author = "Ben Keen";
     protected $authorEmail = "ben.keen@gmail.com";
     protected $authorLink = "https://formtools.org";
-    protected $version = "2.0.5";
-    protected $date = "2018-01-24";
+    protected $version = "2.0.6";
+    protected $date = "2018-03-24";
     protected $originLanguage = "en_us";
     protected $jsFiles = array(
         "https://www.gstatic.com/charts/loader.js",
