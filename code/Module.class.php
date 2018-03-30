@@ -17,8 +17,8 @@ class Module extends FormToolsModule
     protected $author = "Ben Keen";
     protected $authorEmail = "ben.keen@gmail.com";
     protected $authorLink = "https://formtools.org";
-    protected $version = "2.0.6";
-    protected $date = "2018-03-24";
+    protected $version = "2.0.7";
+    protected $date = "2018-03-31";
     protected $originLanguage = "en_us";
     protected $jsFiles = array(
         "https://www.gstatic.com/charts/loader.js",
@@ -86,14 +86,11 @@ class Module extends FormToolsModule
         ";
 
         try {
-            $db->beginTransaction();
             foreach ($queries as $query) {
                 $db->query($query);
                 $db->execute();
             }
-            $db->processTransaction();
         } catch (Exception $e) {
-            $db->rollbackTransaction();
             $L = $this->getLangStrings();
             return array(false, $L["notify_installation_problem_c"] . " <b>" . $e->getMessage() . "</b>");
         }
@@ -196,7 +193,7 @@ class Module extends FormToolsModule
 
         $vis_id_str = implode(",", $vis_ids);
 
-      // output the visualization IDs right into the page. This will save an HTTP request to retrieve them later
+      // output the visualization IDs right into the page. This saves an HTTP request to retrieve them later
       echo <<< END
     <script>g.vis_ids = [$vis_id_str];</script>
 END;

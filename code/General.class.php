@@ -19,45 +19,14 @@ class General
      */
     public static function getQuicklinkVisualizations($form_id, $view_id)
     {
-        $db = Core::$db;
-        $account_type = Core::$user->getAccountType();
-        $account_id = Core::$user->getAccountId();
-
-        $private_client_accessible_vis_ids = array();
-        if ($account_type == "client") {
-            $db->query("
-                SELECT vis_id
-                FROM   {PREFIX}module_data_visualization_clients
-                WHERE  account_id = :account_id
-            ");
-            $db->bind("account_id", $account_id);
-            $db->execute();
-
-            $private_client_accessible_vis_ids = $db->fetchAll(PDO::FETCH_COLUMN);
-        }
-
         $visualizations = Visualizations::searchVisualizations(array(
             "form_id"      => $form_id,
             "view_id"      => $view_id,
-            "account_type" => $account_type
+            "account_type" => Core::$user->getAccountType(),
+            "client_id"    => Core::$user->getAccountId()
         ));
 
-        $accessible_visualizations = array();
-        foreach ($visualizations as $vis_info) {
-            if ($vis_info["access_type"] == "public") {
-                $accessible_visualizations[] = $vis_info["vis_id"];
-            } else {
-                if ($account_type == "client") {
-                    if ($vis_info["access_type"] != "admin" && in_array($vis_info["export_group_id"], $private_client_accessible_vis_ids)) {
-                        $accessible_visualizations[] = $vis_info["vis_id"];
-                    }
-                } else {
-                    $accessible_visualizations[] = $vis_info["vis_id"];
-                }
-            }
-        }
-
-        return $accessible_visualizations;
+        return array_column($visualizations, "vis_id");
     }
 
 

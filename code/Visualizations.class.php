@@ -157,7 +157,6 @@ class Visualizations
 
         $where_clauses = array();
         if (isset($search_criteria["keyword"]) && !empty($search_criteria["keyword"])) {
-            //$keyword = General::sanitize($search_criteria["keyword"]);
             $keyword = $search_criteria["keyword"];
             $where_clauses[] = "vis_name LIKE '%$keyword%'";
         }
@@ -210,6 +209,8 @@ class Visualizations
                 }
             }
 
+            // if this is a client account, check the permissions for admin/private forms to confirm the visualization
+            // can be viewed
             if ($account_type == "client") {
                 if ($row["access_type"] == "admin") {
                     continue;
