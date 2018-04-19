@@ -59,6 +59,7 @@ FormTools\Modules\DataVisualization\Visualizations::displayVisualization({$vis_i
     <div class="grey_box margin_bottom_large">
         <textarea style="width:100%; height: 150px" id="own_pages_editor" class="medium_grey">&lt;?php
 require_once('{$g_root_dir}/global/library.php');
+FormTools\Core::init(array("start_sessions" => false));
 FormTools\Modules::includeModule("data_visualization");
 $width  = 600;
 $height = 300;
