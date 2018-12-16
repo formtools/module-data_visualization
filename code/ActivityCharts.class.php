@@ -12,24 +12,6 @@ use PDO, Exception;
 
 class ActivityCharts
 {
-    private static $intervalMap = array(
-        "last_7_days"    => 7,
-        "last_10_days"   => 10,
-        "last_14_days"   => 14,
-        "last_21_days"   => 21,
-        "last_30_days"   => 30,
-        "last_2_months"  => 60,
-        "last_3_months"  => 90,
-        "last_4_months"  => 120,
-        "last_5_months"  => 151,
-        "last_6_months"  => 182,
-        "last_12_months" => 365,
-        "last_2_years"   => 730,
-        "last_3_years"   => 1095,
-        "last_4_years"   => 1460,
-        "last_5_years"   => 1825
-    );
-
     /**
      * Adds a new activity chart to the database.
      *
@@ -184,8 +166,8 @@ class ActivityCharts
                 $date_range_clause = "YEAR(submission_date) = YEAR(CURDATE()) AND MONTH(submission_date) = MONTH(CURDATE())";
                 break;
             default:
-                if (array_key_exists($date_range, self::$intervalMap)) {
-                    $value = self::$intervalMap[$date_range];
+                if (array_key_exists($date_range, General::$intervalMap)) {
+                    $value = General::$intervalMap[$date_range];
                     $date_range_clause = "submission_date >= DATE_SUB(NOW(), INTERVAL {$value} DAY)";
                 }
                 break;
@@ -257,16 +239,16 @@ class ActivityCharts
         );
     }
 
-
-    /**
-     * Helper function for dv_get_activity_info(). This looks at the count grouping (day / month) and returns
-     * the appropriate SELECT query clause, plus
-     *
-     * @param string
-     * @param integer $form_id
-     * @param integer $view_id
-     * @param array
-     */
+	/**
+	 * Helper function for dv_get_activity_info(). This looks at the count grouping (day / month) and returns
+	 * the appropriate SELECT query clause.
+	 * @param $submission_count_group
+	 * @param $date_range
+	 * @param $date_range_clause
+	 * @param $form_id
+	 * @param $filter_sql_clauses
+	 * @return array
+	 */
     public static function getActivityAccountSelectQueryInfo($submission_count_group, $date_range, $date_range_clause,
         $form_id, $filter_sql_clauses)
     {
@@ -318,7 +300,7 @@ class ActivityCharts
                         $first_day = date("Y-m") . "-01";
                         break;
                     default:
-                        $first_day = date("Y-m-d", date("U") - (self::$intervalMap[$date_range] * $day_in_secs));
+                        $first_day = date("Y-m-d", date("U") - (General::$intervalMap[$date_range] * $day_in_secs));
                         break;
                 }
             }
@@ -424,6 +406,7 @@ class ActivityCharts
             */
 
         } else if ($submission_count_group == "month") {
+
             // if no date range clause was specified, the user wants to return everything. In which case, the start date
             // is therefore dependant on whatever's stored in the database
             $first_day = "";
@@ -454,7 +437,7 @@ class ActivityCharts
                         $first_day = date("Y-m") . "-01";
                         break;
                     default:
-                        $first_day = date("Y-m-d", date("U") - (self::$intervalMap[$date_range] * $day_in_secs));
+                        $first_day = date("Y-m-d", date("U") - (General::$intervalMap[$date_range] * $day_in_secs));
                         break;
                 }
                 list($start_year, $start_month, $start_day) = explode("-", $first_day);

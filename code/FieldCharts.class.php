@@ -73,20 +73,23 @@ class FieldCharts
     /**
      * This is a wrapper for dv_get_activity_info(). It checks the cache to see if there's a recent cache that
      * can be used instead of re-doing the SQL query.
-     *
-     * @param integer $vis_id
-     * @param string $cache_update_frequency an hour (integer), or "no_cache"
-     * @param integer $form_id
-     * @param integer $view_id
-     * @param integer $field_id
-     */
-    public static function getCachedFieldInfo($vis_id, $cache_update_frequency, $form_id, $view_id, $field_id, $ignore_empty_fields)
+	 * @param $vis_id
+	 * @param $cache_update_frequency
+	 * @param $form_id
+	 * @param $view_id
+	 * @param $field_id
+	 * @param $date_range
+	 * @param $ignore_empty_fields
+	 * @return array
+	 */
+    public static function getCachedFieldInfo($vis_id, $cache_update_frequency, $form_id, $view_id, $field_id, $date_range,
+		$ignore_empty_fields)
     {
         $db = Core::$db;
 
         // if the user has request NO cache for this Activity Chart, always do a fresh query
         if ($cache_update_frequency == "no_cache") {
-            $return_info = self::getFieldChartInfo($form_id, $view_id, $field_id, $ignore_empty_fields);
+            $return_info = self::getFieldChartInfo($form_id, $view_id, $field_id, $date_range, $ignore_empty_fields);
             $return_info["cache_update_frequency"] = $cache_update_frequency;
             return $return_info;
         }
@@ -116,7 +119,7 @@ class FieldCharts
         }
 
         // Here, there's nothing valid in the cache. Run the query and cache the data.
-        $return_info = self::getFieldChartInfo($form_id, $view_id, $field_id, $ignore_empty_fields);
+        $return_info = self::getFieldChartInfo($form_id, $view_id, $field_id, $date_range, $ignore_empty_fields);
         $return_info["cache_update_frequency"] = $cache_update_frequency;
 
         General::updateVisualizationCache($vis_id, $return_info["data"]);
@@ -125,12 +128,28 @@ class FieldCharts
     }
 
 
-    public static function getFieldChartInfo($form_id, $view_id, $field_id, $ignore_empty_fields)
+    public static function getFieldChartInfo($form_id, $view_id, $field_id, $date_range, $ignore_empty_fields)
     {
         $db = Core::$db;
 
         $result = Fields::getFieldColByFieldId($form_id, $field_id);
         $col_name = $result[$field_id];
+
+		$date_range_clause = "";
+		switch ($date_range) {
+			case "year_to_date":
+				$date_range_clause = "AND YEAR(submission_date) = YEAR(CURDATE())";
+				break;
+			case "month_to_date":
+				$date_range_clause = "AND YEAR(submission_date) = YEAR(CURDATE()) AND MONTH(submission_date) = MONTH(CURDATE())";
+				break;
+			default:
+				if (array_key_exists($date_range, General::$intervalMap)) {
+					$value = General::$intervalMap[$date_range];
+					$date_range_clause = "AND submission_date >= DATE_SUB(NOW(), INTERVAL {$value} DAY)";
+				}
+				break;
+		}
 
         $filter_where_clause = "";
         if (!empty($view_id)) {
@@ -144,8 +163,10 @@ class FieldCharts
             $db->query("
                 SELECT $col_name as field_value, count(*) as count
                 FROM   {PREFIX}form_{$form_id}
-                WHERE  $col_name IS NOT NULL AND TRIM($col_name) != ''
+                WHERE  1 = 1 
+                	   AND $col_name IS NOT NULL AND TRIM($col_name) != ''
                        $filter_where_clause
+                       $date_range_clause
                 GROUP BY field_value
             ");
         } else {
@@ -159,6 +180,7 @@ class FieldCharts
                   FROM {PREFIX}form_{$form_id}
                   WHERE 1 = 1
                         $filter_where_clause
+                        $date_range_clause
                   GROUP BY field_value
             ");
         }
@@ -185,18 +207,21 @@ class FieldCharts
             "form_id" => $form_id,
             "view_id" => $view_id,
             "field_id" => $field_id,
+            "date_range" => $date_range,
             "data" => $results,
             "last_cached" => $now
         );
     }
 
 
-    /**
-     * Updates the appropriate tab of the field chart.
-     *
-     * @param integer $vis_id
-     * @param array $info
-     */
+	/**
+	 * Updates the appropriate tab of the field chart.
+	 * @param $vis_id
+	 * @param $tab
+	 * @param $info
+	 * @param $L
+	 * @return array
+	 */
     public static function updateFieldChart($vis_id, $tab, $info, $L)
     {
         $success = true;
@@ -269,6 +294,7 @@ class FieldCharts
             $db->query("
                 UPDATE {PREFIX}module_data_visualizations
                 SET    chart_type = :chart_type,
+                	   date_range = :date_range,
                        field_chart_ignore_empty_fields = :field_chart_ignore_empty_fields,
                        pie_chart_format = :pie_chart_format,
                        colour = :colour,
@@ -278,6 +304,7 @@ class FieldCharts
             ");
             $db->bindAll(array(
                 "chart_type" => $info["chart_type"],
+                "date_range" => $info["date_range"],
                 "field_chart_ignore_empty_fields" =>  $info["field_chart_ignore_empty_fields"],
                 "pie_chart_format" => $pie_chart_format,
                 "colour" => $colour,

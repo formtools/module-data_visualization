@@ -163,6 +163,7 @@ $L["phrase_not_cached"] = "Not cached";
 $L["phrase_please_select_view"] = "Please select a View";
 $L["phrase_edit_this_field_chart"] = "Edit this Field Chart";
 $L["phrase_hide_visualizations_from_client_accounts"] = "Hide visualizations from client accounts";
+$L["phrase_all_time"] = "All time";
 
 $L["text_pages_module_intro"] = "This module is compatible with the Pages module. You can embed any visualization into a Page by copying and pasting the code below - or, just click the button below to automatically create and configure a new page containing this visualization.";
 $L["text_no_visualizations"] = "There are no visualizations set up yet. Click the button below to get started!";

@@ -11,12 +11,35 @@ use PDO, Exception;
 
 class General
 {
+	public static $intervalMap = array(
+		"last_7_days"    => 7,
+		"last_10_days"   => 10,
+		"last_14_days"   => 14,
+		"last_21_days"   => 21,
+		"last_30_days"   => 30,
+		"last_2_months"  => 60,
+		"last_3_months"  => 90,
+		"last_4_months"  => 120,
+		"last_5_months"  => 151,
+		"last_6_months"  => 182,
+		"last_12_months" => 365,
+		"last_2_years"   => 730,
+		"last_3_years"   => 1095,
+		"last_4_years"   => 1460,
+		"last_5_years"   => 1825
+	);
 
-    /**
+	/**
      * This returns all visualizations flagged to show up in the quicklinks dialog window.
      *
      * @param $view_id
      */
+
+	/**
+	 * @param $form_id
+	 * @param $view_id
+	 * @return array
+	 */
     public static function getQuicklinkVisualizations($form_id, $view_id)
     {
         $visualizations = Visualizations::searchVisualizations(array(

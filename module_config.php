@@ -253,7 +253,7 @@ $FILES = array(
     "scripts/manage_visualizations.js",
     "scripts/visualizations.js",
     "settings.php",
-    "smarty_plugins/function.activity_chart_date_range.php",
+    "smarty_plugins/function.chart_date_range.php",
     "smarty_plugins/function.cache_frequency_dropdown.php",
     "smarty_plugins/function.colour_dropdown.php",
     "smarty_plugins/function.line_width_dropdown.php",

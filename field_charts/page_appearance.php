@@ -25,7 +25,7 @@ $(function() {
     });
 
     $("input[name=pie_chart_format], input[name=include_legend]").bind("change keyup", vis_ns.redraw_field_chart);
-    $("input[name=field_chart_ignore_empty_fields]").bind("change", vis_ns.update_field_chart_data);
+    $("#date_range, input[name=field_chart_ignore_empty_fields]").bind("change", vis_ns.update_field_chart_data);
     $("#colour, input[name=pie_chart_format], input[name=include_legend_quicklinks], input[name=include_legend_full_size]").bind("change keyup", vis_ns.redraw_field_chart);
     
     $("input[name=chart_type]").bind("change", function() {

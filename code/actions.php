@@ -64,8 +64,9 @@ switch ($action) {
         $form_id  = $request["form_id"];
         $view_id  = $request["view_id"];
         $field_id = $request["field_id"];
+		$date_range = $request["date_range"];
         $ignore_empty_fields = $request["ignore_empty_fields"];
-        $data = FieldCharts::getFieldChartInfo($form_id, $view_id, $field_id, $ignore_empty_fields);
+        $data = FieldCharts::getFieldChartInfo($form_id, $view_id, $field_id, $date_range, $ignore_empty_fields);
         send_json($data);
         break;
 
