@@ -39,7 +39,7 @@ dv_ns.dialog_opened = false;
 
 $(function() {
   $("#dv_vis_refresh_cache").live("click", function() {
-    $(this).css("background", "transparent url(" + g.root_url + "/images/loading_small.gif) no-repeat center center");
+    $(this).css("background", "transparent url(" + g.root_url + "/global/images/loading_small.gif) no-repeat center center");
     $.ajax({
       url:      g.root_url + "/modules/data_visualization/code/actions.php",
       type:     "POST",

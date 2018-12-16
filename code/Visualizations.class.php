@@ -101,7 +101,6 @@ class Visualizations
         $cache_update_frequency = $vis_info["cache_update_frequency"];
 
         $return_info = array();
-        $return_info["cache_update_frequency"] = $cache_update_frequency;
 
         switch ($vis_info["vis_type"]) {
             case "activity":
@@ -117,13 +116,16 @@ class Visualizations
                 $return_info["vis_name"] = $vis_info["vis_name"];
                 $return_info["vis_colour"] = $vis_info["colour"];
                 $return_info["line_width"] = $vis_info["line_width"];
+				$return_info["cache_update_frequency"] = $cache_update_frequency;
                 break;
 
             case "field":
                 $field_id = $vis_info["field_id"];
                 $ignore_empty_fields = $vis_info["field_chart_ignore_empty_fields"];
+                $date_range = $vis_info["date_range"];
+
                 $return_info = FieldCharts::getCachedFieldInfo($vis_id, $cache_update_frequency, $form_id, $view_id, $field_id,
-                    $ignore_empty_fields);
+                    $date_range, $ignore_empty_fields);
                 $return_info["vis_type"] = "field";
                 $return_info["chart_type"] = $vis_info["chart_type"];
                 $return_info["vis_id"] = $vis_id;
@@ -133,6 +135,7 @@ class Visualizations
                 $return_info["include_legend_full_size"] = $vis_info["include_legend_full_size"];
                 $return_info["pie_chart_format"] = $vis_info["pie_chart_format"];
                 $return_info["ignore_empty_fields"] = $vis_info["field_chart_ignore_empty_fields"];
+				$return_info["cache_update_frequency"] = $cache_update_frequency;
                 break;
         }
 
@@ -498,11 +501,11 @@ END;
     }
 
 
-    /**
-     * Helper function to return the previous and next Visualization IDs for
-     *
-     * @param $vis_id
-     */
+	/**
+	 * Helper function to return the previous and next Visualization IDs for the Edit Visualization pages.
+	 * @param $vis_id
+	 * @return array
+	 */
     public static function getTabsetLinks($vis_id)
     {
         $keyword = Modules::loadModuleField("data_visualization", "keyword", "dv_search_keyword", "");
@@ -536,22 +539,22 @@ END;
             return $return_info;
         }
 
-        $sorted_vis_ids = array();
+        $ordered_vis_ids = array();
         $vis_id_to_types = array();
         foreach ($results as $vis_info) {
-            $sorted_vis_ids[] = $vis_info["vis_id"];
+            $ordered_vis_ids[] = $vis_info["vis_id"];
             $vis_id_to_types[$vis_info["vis_id"]] = $vis_info["vis_type"];
         }
-        $current_index = array_search($vis_id, $sorted_vis_ids);
+        $current_index = array_search($vis_id, $ordered_vis_ids);
 
-        if (!$current_index) {
+        if ($current_index === false) {
             return $return_info;
         }
 
-        $num_results = count($sorted_vis_ids);
+        $num_results = count($ordered_vis_ids);
         if ($current_index === 0) {
             if ($num_results > 1) {
-                $next_vis_id = $sorted_vis_ids[$current_index + 1];
+                $next_vis_id = $ordered_vis_ids[$current_index + 1];
                 if ($vis_id_to_types[$next_vis_id] == "activity") {
                     $return_info["next_link"] = "../activity_charts/edit.php?vis_id=$next_vis_id";
                 } else {
@@ -561,7 +564,7 @@ END;
         } else {
             if ($current_index === $num_results - 1) {
                 if ($num_results > 1) {
-                    $prev_vis_id = $sorted_vis_ids[$current_index - 1];
+                    $prev_vis_id = $ordered_vis_ids[$current_index - 1];
                     if ($vis_id_to_types[$prev_vis_id] == "activity") {
                         $return_info["prev_link"] = "../activity_charts/edit.php?vis_id=$prev_vis_id";
                     } else {
@@ -569,14 +572,14 @@ END;
                     }
                 }
             } else {
-                $prev_vis_id = $sorted_vis_ids[$current_index - 1];
+                $prev_vis_id = $ordered_vis_ids[$current_index - 1];
                 if ($vis_id_to_types[$prev_vis_id] == "activity") {
                     $return_info["prev_link"] = "../activity_charts/edit.php?vis_id=$prev_vis_id";
                 } else {
                     $return_info["prev_link"] = "../field_charts/edit.php?vis_id=$prev_vis_id";
                 }
 
-                $next_vis_id = $sorted_vis_ids[$current_index + 1];
+                $next_vis_id = $ordered_vis_ids[$current_index + 1];
                 if ($vis_id_to_types[$next_vis_id] == "activity") {
                     $return_info["next_link"] = "../activity_charts/edit.php?vis_id=$next_vis_id";
                 } else {

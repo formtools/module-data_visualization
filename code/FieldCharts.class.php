@@ -15,11 +15,13 @@ use Exception;
 
 class FieldCharts
 {
-    /**
-     * Adds a new field chart.
-     *
-     * @param array $info
-     */
+
+	/**
+	 * Adds a new field chart.
+	 * @param $info
+	 * @param $L
+	 * @return array
+	 */
     public static function addFieldChart($info, $L)
     {
         $db = Core::$db;
