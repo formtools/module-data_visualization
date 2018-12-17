@@ -18,12 +18,12 @@ if (isset($request["clear_cache"])) {
 
 if (isset($request["update"])) {
 	$settings = array(
-        "quicklinks_dialog_width"      => $request["quicklinks_dialog_width"],
-        "quicklinks_dialog_height"     => $request["quicklinks_dialog_height"],
-        "quicklinks_dialog_thumb_size" => $request["quicklinks_dialog_thumb_size"],
-        "default_cache_frequency"      => $request["default_cache_frequency"],
-        "hide_from_client_accounts"    => $request["hide_from_client_accounts"],
-        "clients_may_refresh_cache"    => $request["clients_may_refresh_cache"]
+		"quicklinks_dialog_width" => $request["quicklinks_dialog_width"],
+		"quicklinks_dialog_height" => $request["quicklinks_dialog_height"],
+		"quicklinks_dialog_thumb_size" => $request["quicklinks_dialog_thumb_size"],
+		"default_cache_frequency" => $request["default_cache_frequency"],
+		"hide_from_client_accounts" => $request["hide_from_client_accounts"],
+		"clients_may_refresh_cache" => $request["clients_may_refresh_cache"]
 	);
 	Modules::setModuleSettings($settings);
 
@@ -32,12 +32,12 @@ if (isset($request["update"])) {
 }
 
 $page_vars = array(
-    "g_success" => $success,
-    "g_message" => $message,
-    "module_settings" => $module->getSettings()
+	"g_success" => $success,
+	"g_message" => $message,
+	"module_settings" => $module->getSettings()
 );
 
-$page_vars["head_js"] =<<< END
+$page_vars["head_js"] = <<< END
 var rules = [];
 rules.push("required,quicklinks_dialog_width,{$L["validation_no_dialog_width"]}");
 rules.push("digits_only,quicklinks_dialog_width,{$L["validation_invalid_dialog_width"]}");
