@@ -509,10 +509,10 @@ END;
     public static function getTabsetLinks($vis_id)
     {
         $keyword = Modules::loadModuleField("data_visualization", "keyword", "dv_search_keyword", "");
-        $search_form_id = Modules::loadModuleField("data_visualization", "form_id", "dv_form_id", "");
-        $search_view_id = Modules::loadModuleField("data_visualization", "view_id", "dv_view_id", "");
+        $search_form_id = Modules::loadModuleField("data_visualization", "dv_search_form_id", "dv_form_id", "");
+        $search_view_id = Modules::loadModuleField("data_visualization", "dv_search_view_id", "dv_view_id", "");
         $vis_types = Modules::loadModuleField("data_visualization", "vis_types", "dv_vis_types", array("activity", "field"));
-        $chart_type = Modules::loadModuleField("data_visualization", "chart_type", "dv_chart_type", "");
+        $chart_type = Modules::loadModuleField("data_visualization", "dv_search_chart_type", "dv_chart_type", "");
         $account_type = Modules::loadModuleField("data_visualization", "account_type", "dv_account_type", "admin");
         $client_id = Modules::loadModuleField("data_visualization", "client_id", "dv_client_id", "");
 
