@@ -216,6 +216,7 @@ $L["notify_visualization_cache_cleared"] = "The visualization cache has been cle
 $L["notify_specific_visualization_cache_cleared"] = "The cache for this visualization has been cleared.";
 $L["notify_no_internet_connection"] = "Sorry, we cannot load the Google Charts library. This is most likely caused by there being no internet connection available.";
 $L["notify_installation_problem_c"] = "There was a problem installing the module: ";
+$L["notify_missing_field"] = "The field that this visualization was using can no longer be found. Please assign a new field or delete this visualization.";
 
 $L["confirm_delete_visualization"] = "Are you sure you want to delete this visualization?";
 

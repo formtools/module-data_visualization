@@ -29,12 +29,7 @@
         <tr>
             <td class="pad_left_small">{$LANG.word_field}</td>
             <td>
-                <select name="field_id" id="field_id">
-                    {foreach from=$form_fields item=field_info}
-                        <option value="{$field_info.field_id}"
-                                {if $field_info.field_id == $vis_info.field_id}selected{/if}>{$field_info.field_title}</option>
-                    {/foreach}
-                </select>
+                {chart_form_field_dropdown name_id="field_id" form_id=$vis_info.form_id selected=$vis_info.field_id}
             </td>
         </tr>
         <tr>

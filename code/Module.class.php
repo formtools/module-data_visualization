@@ -163,14 +163,13 @@ class Module extends FormToolsModule
     }
 
 
-    /**
-     * This adds the quicklink icon to the Submission Listing page. This function is already assigned to those
-     * particular hooks on the admin and client Submission Listing pages.
-     *
-     * It only shows the icon if there's at least ONE visualization to show for this form View.
-     *
-     * @param array $params
-     */
+	/**
+	 * This adds the quicklink icon to the Submission Listing page. This function is already assigned to those
+	 * particular hooks on the admin and client Submission Listing pages. It only shows the icon if there's at least one
+	 * visualization to show for the form View.
+	 * @param $params
+	 * @return array|string
+	 */
     public function addQuicklink($params)
     {
         $root_url = Core::getRootUrl();
