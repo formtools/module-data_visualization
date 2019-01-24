@@ -165,7 +165,7 @@ class FieldCharts
             $db->query("
                 SELECT $col_name as field_value, count(*) as count
                 FROM   {PREFIX}form_{$form_id}
-                WHERE  1 = 1 
+                WHERE  is_finalized = 'yes' 
                 	   AND $col_name IS NOT NULL AND TRIM($col_name) != ''
                        $filter_where_clause
                        $date_range_clause
@@ -180,7 +180,7 @@ class FieldCharts
                     ELSE $col_name
                   END as field_value, count(*) as count
                   FROM {PREFIX}form_{$form_id}
-                  WHERE 1 = 1
+                  WHERE is_finalized = 'yes'
                         $filter_where_clause
                         $date_range_clause
                   GROUP BY field_value
