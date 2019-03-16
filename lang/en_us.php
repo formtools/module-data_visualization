@@ -7,6 +7,7 @@ $L["module_name"] = "Data Visualization";
 $L["module_description"] = "This module utilizes Google Charts API to create custom graphs and charts of your form submission data, providing an alternative, visual interpretation of your data.";
 
 $L["word_visualizations"] = "Visualizations";
+$L["word_advanced"] = "Advanced";
 $L["word_appearance"] = "Appearance";
 $L["word_area"] = "Area";
 $L["word_bar"] = "Bar";

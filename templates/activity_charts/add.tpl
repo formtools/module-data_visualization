@@ -65,7 +65,7 @@
                         <tr>
                             <td class="pad_left_small">Date Range to display</td>
                             <td>
-                                {chart_date_range_dropdown name_id="date_range" default=$module_settings.activity_chart_date_range}
+                                {chart_date_range name_id="date_range" default=$module_settings.activity_chart_date_range}
                             </td>
                         </tr>
                         <tr>

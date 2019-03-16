@@ -36,7 +36,7 @@ $tabs = array(
 	"main" => array("tab_label" => $LANG["word_main"], "tab_link" => "{$same_page}?page=main&vis_id={$vis_id}"),
 	"appearance" => array("tab_label" => $L["word_appearance"], "tab_link" => "{$same_page}?page=appearance&vis_id={$vis_id}"),
 	"permissions" => array("tab_label" => $LANG["word_permissions"], "tab_link" => "{$same_page}?page=permissions&vis_id={$vis_id}"),
-	"advanced" => array("tab_label" => $LANG["word_advanced"], "tab_link" => "{$same_page}?page=advanced&vis_id={$vis_id}")
+	"advanced" => array("tab_label" => $L["word_advanced"], "tab_link" => "{$same_page}?page=advanced&vis_id={$vis_id}")
 );
 
 $links = Visualizations::getTabsetLinks($vis_id);
