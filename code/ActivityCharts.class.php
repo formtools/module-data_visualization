@@ -229,7 +229,7 @@ class ActivityCharts
         }
 
         $results = array();
-        while (list($key, $value) = each($stats)) {
+        foreach ($stats as $key => $value) {
             $results[] = $value;
         }
 
